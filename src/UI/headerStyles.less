@@ -1,0 +1,89 @@
+@import '../styles/variables.less';
+
+.header {
+  background-color: var(--header-bg-color);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 60px;
+  position: relative;
+
+  .logo {
+    margin-right: auto;
+
+    img {
+      height: 40px;
+    }
+  }
+
+  .nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  
+    li {
+      margin-left: 20px;
+  
+      button {
+        background: none;
+        border: none;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+        padding: 10px;
+        text-decoration: none;
+        font-weight: bold;
+  
+        &.active {
+          border-bottom: 2px solid @accent-color;
+        }
+  
+        &:hover {
+          color: @accent-color;
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      display: none;
+
+      &.open {
+        display: block;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background-color: @header-bg-color;
+        width: 100%;
+
+        ul {
+          flex-direction: column;
+
+          li {
+            margin: 0;
+
+            a {
+              display: block;
+              padding: 15px;
+              border-bottom: 1px solid @border-color;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: inherit;
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+}
