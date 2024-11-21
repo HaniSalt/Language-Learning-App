@@ -1,0 +1,62 @@
+@import '../styles/variables.less';
+
+.deck-list {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 20px;
+
+  h2 {
+    text-align: center;
+    color: @accent-color;
+    margin-bottom: 30px;
+  }
+
+  .deck-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+
+    .deck-item {
+      background-color: @card-bg-color;
+      border: 1px solid @border-color;
+      border-radius: 8px;
+      width: 200px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 18px;
+      color: @text-color;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        background-color: lighten(@accent-color, 40%);
+        transform: translateY(-5px);
+      }
+
+      .deck-name {
+        padding: 10px;
+      }
+    }
+  }
+}
+
+/* Dark theme styles */
+body.dark-theme .deck-list h2 {
+  color: @dark-accent-color;
+}
+
+body.dark-theme .deck-item {
+  background-color: @dark-card-bg-color;
+  border: 1px solid @dark-border-color;
+  color: @dark-text-color;
+
+  &:hover {
+    background-color: lighten(@dark-accent-color, 10%);
+  }
+}

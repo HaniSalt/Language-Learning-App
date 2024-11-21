@@ -1,17 +1,16 @@
 import { FunctionalComponent, h } from 'preact';
+import { Deck } from '../utils/storage';
+import './deckItemStyles.less';
 
 interface DeckItemProps {
-  deck: {
-    id: number;
-    name: string;
-  };
+  deck: Deck;
   onSelect: (id: number) => void;
 }
 
 export const DeckItem: FunctionalComponent<DeckItemProps> = ({ deck, onSelect }) => {
   return (
-    <li>
-      <button onClick={() => onSelect(deck.id)}>{deck.name}</button>
-    </li>
+    <div class="deck-item" onClick={() => onSelect(deck.id)}>
+      <div class="deck-name">{deck.name}</div>
+    </div>
   );
 };

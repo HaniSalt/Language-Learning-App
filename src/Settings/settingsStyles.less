@@ -1,0 +1,67 @@
+/* settingsStyles.less */
+
+@import '../styles/variables.less';
+
+.settings {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: @card-bg-color;
+  border: 1px solid @border-color;
+  border-radius: 8px;
+
+  h2 {
+    margin-bottom: 20px;
+    color: @accent-color;
+    text-align: center;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: @text-color;
+    margin-bottom: 15px;
+
+    input[type='number'] {
+      margin-left: 10px;
+      padding: 8px;
+      border: 1px solid @border-color;
+      border-radius: 4px;
+      font-size: 16px;
+      width: 100px;
+    }
+
+    input[type='checkbox'] {
+      margin-left: 10px;
+      transform: scale(1.5);
+    }
+  }
+
+  .theme-toggle {
+    input[type='checkbox'] {
+      margin-left: 10px;
+    }
+  }
+}
+
+/* Dark theme styles */
+body.dark-theme .settings {
+  background-color: @dark-card-bg-color;
+  border: 1px solid @dark-border-color;
+  color: @dark-text-color;
+
+  h2 {
+    color: @dark-accent-color;
+  }
+
+  label {
+    color: @dark-text-color;
+
+    input {
+      background-color: @dark-background-color;
+      border: 1px solid @dark-border-color;
+      color: @dark-text-color;
+    }
+  }
+}

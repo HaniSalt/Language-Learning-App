@@ -1,3 +1,5 @@
+// src/App.tsx
+
 import { FunctionalComponent, h } from 'preact';
 import { useState } from 'preact/hooks';
 import { Header } from './UI/Header';
@@ -39,10 +41,14 @@ const App: FunctionalComponent = () => {
 
   return (
     <div class="app-container">
-      <Header page={page} setPage={setPage} />
-      <div class="content-container">
-        {renderPage()}
-      </div>
+      <Header
+        page={page}
+        setPage={(newPage) => {
+          setPage(newPage);
+          setSelectedDeckId(null); // Reset selected deck when changing pages
+        }}
+      />
+      <div class="content-container">{renderPage()}</div>
       <Footer />
     </div>
   );

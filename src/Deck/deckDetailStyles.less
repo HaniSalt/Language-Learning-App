@@ -1,0 +1,97 @@
+/* deckDetailStyles.less */
+
+@import '../styles/variables.less';
+
+/* Correct comment syntax and variable usage */
+
+.deck-detail {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px); /* Adjusted for header and footer heights */
+}
+
+.deck-top-bar {
+  background-color: @header-bg-color;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .deck-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: @text-color;
+  }
+
+  .deck-exit {
+    button {
+      background-color: @accent-color;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: @accent-color-dark;
+      }
+    }
+  }
+}
+
+.card-viewer-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deck-bottom-bar {
+  background-color: @footer-bg-color;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .deck-actions {
+    position: relative;
+
+    .options-button {
+      background-color: @accent-color;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: @accent-color-dark;
+      }
+    }
+
+    .options-dropdown {
+      position: absolute;
+      bottom: 50px; /* Position above the bottom bar */
+      left: 0;
+      background-color: #fff;
+      border: 1px solid @border-color;
+      border-radius: 4px;
+      overflow: hidden;
+      z-index: 1000;
+
+      button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover {
+          background-color: @footer-bg-color;
+        }
+      }
+    }
+  }
+}

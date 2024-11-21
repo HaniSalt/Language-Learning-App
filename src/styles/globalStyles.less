@@ -1,5 +1,17 @@
-/* globalStyles.less */
 @import './variables.less';
+
+body {
+  font-size: var(--app-font-size, 16px);
+  background-color: @background-color;
+  color: @text-color;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+body.dark-theme {
+  background-color: @dark-background-color;
+  color: @dark-text-color;
+}
 
 .app-container {
   display: flex;
@@ -16,4 +28,9 @@
   color: @text-color;
   text-align: center;
   padding: 20px;
+}
+
+body.dark-theme .footer {
+  background-color: @dark-footer-bg-color;
+  color: @dark-text-color;
 }

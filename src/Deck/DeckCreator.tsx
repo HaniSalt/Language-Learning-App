@@ -1,14 +1,24 @@
 import { FunctionalComponent, h } from 'preact';
 import { useState } from 'preact/hooks';
+import { addDeck } from '../utils/storage';
 
-export const DeckCreator: FunctionalComponent = () => {
+interface DeckCreatorProps {
+  onDeckCreated: (deckId: number) => void;
+}
+
+export const DeckCreator: FunctionalComponent<DeckCreatorProps> = ({ onDeckCreated }) => {
   const [deckName, setDeckName] = useState('');
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
-    // Logic to create a new deck
-    console.log('Creating deck:', deckName);
+    if (deckName.trim() === '') {
+      alert('Deck name cannot be empty.');
+      return;
+    }
+    const newDeck = addDeck(deckName);
+    console.log('Creating deck:', newDeck);
     setDeckName('');
+    onDeckCreated(newDeck.id);
   };
 
   return (
