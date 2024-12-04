@@ -1,16 +1,34 @@
 import { FunctionalComponent, h } from 'preact';
+import { useState, useEffect } from 'preact/hooks';
+import { getDecks, Deck } from '../utils/storage';
+import { Container, Typography, List, ListItem, ListItemText } from '@mui/material';
 
 export const AnalyticsDashboard: FunctionalComponent = () => {
-  const stats = {
-    cardsStudied: 50,
-    decksCompleted: 3,
-  };
+  const [decks, setDecks] = useState<Deck[]>([]);
+
+  useEffect(() => {
+    setDecks(getDecks());
+  }, []);
+
+  const totalCards = decks.reduce((sum, deck) => sum + deck.cards.length, 0);
 
   return (
-    <div>
-      <h2>Analytics Dashboard</h2>
-      <p>Cards Studied: {stats.cardsStudied}</p>
-      <p>Decks Completed: {stats.decksCompleted}</p>
-    </div>
+    <Container>
+      <Typography variant="h4" component="h2" gutterBottom>
+        Analytics Dashboard
+      </Typography>
+      <Typography variant="body1">Total Decks: {decks.length}</Typography>
+      <Typography variant="body1">Total Cards: {totalCards}</Typography>
+      <List>
+        {decks.map(deck => (
+          <ListItem key={deck.id}>
+            <ListItemText
+              primary={deck.name}
+              secondary={`Cards: ${deck.cards.length}`}
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Container>
   );
 };

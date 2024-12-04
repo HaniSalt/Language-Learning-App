@@ -1,6 +1,6 @@
 import { FunctionalComponent, h } from 'preact';
 import { Deck } from '../utils/storage';
-import './deckItemStyles.less';
+import { Card, CardActionArea, CardContent, Typography } from '@mui/material';
 
 interface DeckItemProps {
   deck: Deck;
@@ -9,8 +9,14 @@ interface DeckItemProps {
 
 export const DeckItem: FunctionalComponent<DeckItemProps> = ({ deck, onSelect }) => {
   return (
-    <div class="deck-item" onClick={() => onSelect(deck.id)}>
-      <div class="deck-name">{deck.name}</div>
-    </div>
+    <Card>
+      <CardActionArea onClick={() => onSelect(deck.id)}>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            {deck.name}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 };

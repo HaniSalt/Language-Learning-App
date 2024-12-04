@@ -6,6 +6,8 @@ import { CardViewer } from '../Card/CardViewer';
 import { CardEditor } from '../Card/CardEditor';
 import { getDeckById, deleteDeck, updateDeck, Deck } from '../utils/storage';
 import './deckDetailStyles.less';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
 interface DeckDetailProps {
   deckId: number;
@@ -97,6 +99,29 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({ deckId, onBac
           </div>
         ) : (
           <CardViewer deck={deck} onDeckUpdated={setDeck} />
+        )}
+
+        {isEditingDeckName && (
+          <form class="edit-deck-name-form" onSubmit={handleSaveDeckName}>
+            <TextField
+              label="Deck Name"
+              value={newDeckName}
+              onChange={(e: any) => setNewDeckName(e.target.value)}
+              variant="outlined"
+              fullWidth
+            />
+            <div class="edit-deck-name-actions">
+              <Button type="submit" variant="contained" color="primary">
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => setIsEditingDeckName(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
         )}
       </div>
       <div class="deck-bottom-bar">

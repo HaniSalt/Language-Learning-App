@@ -2,6 +2,10 @@ import { FunctionalComponent, h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { Deck, Card, updateDeck } from '../utils/storage';
 import './cardViewerStyles.less';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 
 interface CardViewerProps {
   deck: Deck;
@@ -72,6 +76,8 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, onDeckU
 
   const card = cards[currentIndex];
 
+  // Inside your CardViewer.tsx
+
   return (
     <div class="card-viewer">
       {isEditingCard ? (
@@ -94,30 +100,62 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, onDeckU
           </div>
         </div>
       ) : (
-        <>
-          <div class={`card ${isFlipped ? 'is-flipped' : ''}`}>
-            <div class="card-inner">
-              <div class="card-face card-front">
-                <p>{card.front}</p>
-              </div>
-              <div class="card-face card-back">
-                <p>{card.back}</p>
-              </div>
+        <div class={`card ${isFlipped ? 'is-flipped' : ''}`}>
+          <div class="card-inner">
+            <div class="card-face card-front">
+              <p>{card.front}</p>
+              {card.imageUrl && (
+                <div class="card-image">
+                  <img src={card.imageUrl} alt="Card Image" />
+                </div>
+              )}
+              {card.audioUrl && (
+                <div class="card-audio">
+                  <audio controls>
+                    <source src={card.audioUrl} />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              )}
+            </div>
+            <div class="card-face card-back">
+              <p>{card.back}</p>
+              {card.imageUrl && (
+                <div class="card-image">
+                  <img src={card.imageUrl} alt="Card Image" />
+                </div>
+              )}
+              {card.audioUrl && (
+                <div class="card-audio">
+                  <audio controls>
+                    <source src={card.audioUrl} />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              )}
             </div>
           </div>
+        </div>
+      )}
+      {!isEditingCard && (
+        <>
           <div class="card-actions">
             <button onClick={handleFlip} class="flip-button">
               {isFlipped ? 'Show Question' : 'Show Answer'}
             </button>
           </div>
+          <div class="card-viewer-bottom">
+            <IconButton onClick={handleEditCard} class="edit-button">
+              <EditIcon />
+            </IconButton>
+            <IconButton onClick={handleDeleteCard} class="delete-button">
+              <DeleteIcon />
+            </IconButton>
+            <IconButton onClick={handleNext} class="next-button">
+              <SkipNextIcon />
+            </IconButton>
+          </div>
         </>
-      )}
-      {!isEditingCard && (
-        <div class="card-viewer-bottom">
-          <button onClick={handleEditCard} class="edit-button">Edit</button>
-          <button onClick={handleDeleteCard} class="delete-button">Delete</button>
-          <button onClick={handleNext} class="next-button">Next Card</button>
-        </div>
       )}
     </div>
   );
