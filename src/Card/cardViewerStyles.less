@@ -78,6 +78,7 @@
     
       audio {
         width: 100%;
+        outline: none;
       }
     }
     
@@ -174,7 +175,10 @@ body.dark-theme .card-viewer {
       }
     }
   }
-
+  body.dark-theme .card-viewer .card-face .card-audio audio {
+    filter: invert(1); // Invert colors if necessary
+  }
+  
   .card-viewer-bottom {
     .edit-button,
     .delete-button,

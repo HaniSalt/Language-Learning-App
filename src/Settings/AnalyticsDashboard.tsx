@@ -2,6 +2,7 @@ import { FunctionalComponent, h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { getDecks, Deck } from '../utils/storage';
 import { Container, Typography, List, ListItem, ListItemText } from '@mui/material';
+import './analyticsDashboardStyles.less';
 
 export const AnalyticsDashboard: FunctionalComponent = () => {
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -13,7 +14,7 @@ export const AnalyticsDashboard: FunctionalComponent = () => {
   const totalCards = decks.reduce((sum, deck) => sum + deck.cards.length, 0);
 
   return (
-    <Container>
+    <Container className="analytics-dashboard">
       <Typography variant="h4" component="h2" gutterBottom>
         Analytics Dashboard
       </Typography>

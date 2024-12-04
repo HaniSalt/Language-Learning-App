@@ -1,10 +1,9 @@
-// src/Deck/DeckList.tsx
-
 import { FunctionalComponent, h } from 'preact';
 import { DeckItem } from './DeckItem';
 import { getDecks, Deck, createDeck } from '../utils/storage';
 import { useState, useEffect } from 'preact/hooks';
 import { Container, Typography, Grid, Button } from '@mui/material';
+import { ImportExport } from './ImportExport';
 import './deckListStyles.less';
 
 interface DeckListProps {
@@ -41,6 +40,7 @@ export const DeckList: FunctionalComponent<DeckListProps> = ({ setSelectedDeckId
           </Grid>
         ))}
       </Grid>
+      <ImportExport />
     </Container>
   );
 };

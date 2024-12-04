@@ -7,9 +7,10 @@ import './cardEditorStyles.less';
 interface CardEditorProps {
   deckId: number;
   onCardAdded: (updatedDeck: Deck) => void;
+  onCancel: () => void;
 }
 
-export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, onCardAdded }) => {
+export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, onCardAdded, onCancel }) => {
   const [frontText, setFrontText] = useState('');
   const [backText, setBackText] = useState('');
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -130,7 +131,11 @@ export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, onCar
         <Button
           variant="outlined"
           onClick={() => {
-            
+            setFrontText('');
+            setBackText('');
+            if (imageInputRef.current) imageInputRef.current.value = '';
+            if (audioInputRef.current) audioInputRef.current.value = '';
+            onCancel();
           }}
         >
           Cancel

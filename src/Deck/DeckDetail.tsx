@@ -84,18 +84,14 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({ deckId, onBac
       </div>
       <div class="card-viewer-container">
         {isAddingCard ? (
-          <CardEditor deckId={deck.id} onCardAdded={handleCardAdded} />
+          <CardEditor
+            deckId={deck.id}
+            onCardAdded={handleCardAdded}
+            onCancel={() => setIsAddingCard(false)}
+          />
         ) : isEditingDeckName ? (
           <div class="edit-deck-name">
-            <input
-              type="text"
-              value={newDeckName}
-              onInput={(e: any) => setNewDeckName(e.target.value)}
-            />
-            <div class="edit-deck-name-actions">
-              <button onClick={handleSaveDeckName}>Save</button>
-              <button onClick={() => setIsEditingDeckName(false)}>Cancel</button>
-            </div>
+            
           </div>
         ) : (
           <CardViewer deck={deck} onDeckUpdated={setDeck} />
@@ -124,20 +120,22 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({ deckId, onBac
           </form>
         )}
       </div>
-      <div class="deck-bottom-bar">
-        <div class="deck-actions">
-          <button onClick={toggleOptions} class="options-button">
-            Deck Options ▼
-          </button>
-          {showOptions && (
-            <div class="options-dropdown">
-              <button onClick={handleAddNewCard}>Add New Card</button>
-              <button onClick={handleEditDeckName}>Edit Deck Name</button>
-              <button onClick={handleDeleteDeck}>Delete Deck</button>
-            </div>
-          )}
+      {!isAddingCard && !isEditingDeckName && ( // Hide options when adding or editing
+        <div class="deck-bottom-bar">
+          <div class="deck-actions">
+            <button onClick={toggleOptions} class="options-button">
+              Deck Options ▼
+            </button>
+            {showOptions && (
+              <div class="options-dropdown">
+                <button onClick={handleAddNewCard}>Add New Card</button>
+                <button onClick={handleEditDeckName}>Edit Deck Name</button>
+                <button onClick={handleDeleteDeck}>Delete Deck</button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

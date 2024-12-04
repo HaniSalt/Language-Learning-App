@@ -125,3 +125,31 @@ body.dark-theme .deck-detail .deck-top-bar {
     }
   }
 }
+
+body.dark-theme .deck-detail .deck-bottom-bar {
+  background-color: @dark-footer-bg-color;
+
+  .deck-actions {
+    .options-button {
+      background-color: @dark-accent-color;
+      color: @dark-text-color;
+
+      &:hover {
+        background-color: @dark-accent-color-dark;
+      }
+    }
+
+    .options-dropdown {
+      background-color: @dark-card-bg-color;
+      border: 1px solid @dark-border-color;
+
+      button {
+        color: @dark-text-color;
+
+        &:hover {
+          background-color: lighten(@dark-footer-bg-color, 10%);
+        }
+      }
+    }
+  }
+}

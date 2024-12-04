@@ -1,13 +1,11 @@
 import { FunctionalComponent, h } from 'preact';
 import './homeStyles.less';
+import { route } from 'preact-router';
 
 export const Home: FunctionalComponent = () => {
-  const scrollToDecks = () => {
-    // Logic to navigate to decks page
-  };
-
-  const scrollToSignup = () => {
-    // Logic to navigate to signup page
+  const goToDecks = () => {
+    route('/decks');
+    window.location.href = '/decks';
   };
 
   return (
@@ -15,8 +13,7 @@ export const Home: FunctionalComponent = () => {
       <h1>Welcome to the Language Learning App</h1>
       <p>Start creating and studying your flashcards today!</p>
       <div class="cta-buttons">
-        <button onClick={scrollToDecks}>Browse Decks</button>
-        <button onClick={scrollToSignup}>Sign Up</button>
+        <button onClick={goToDecks}>Browse Decks</button>
       </div>
       <div class="features">
         <div class="feature">

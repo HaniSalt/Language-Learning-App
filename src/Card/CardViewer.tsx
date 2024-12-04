@@ -76,8 +76,6 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, onDeckU
 
   const card = cards[currentIndex];
 
-  // Inside your CardViewer.tsx
-
   return (
     <div class="card-viewer">
       {isEditingCard ? (
@@ -104,19 +102,6 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, onDeckU
           <div class="card-inner">
             <div class="card-face card-front">
               <p>{card.front}</p>
-              {card.imageUrl && (
-                <div class="card-image">
-                  <img src={card.imageUrl} alt="Card Image" />
-                </div>
-              )}
-              {card.audioUrl && (
-                <div class="card-audio">
-                  <audio controls>
-                    <source src={card.audioUrl} />
-                    Your browser does not support the audio element.
-                  </audio>
-                </div>
-              )}
             </div>
             <div class="card-face card-back">
               <p>{card.back}</p>

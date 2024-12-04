@@ -1,0 +1,17 @@
+@import '../styles/variables.less';
+
+.analytics-dashboard {
+  color: @text-color;
+}
+
+body.dark-theme .analytics-dashboard {
+  color: @dark-text-color;
+
+  .MuiTypography-root,
+  .MuiListItemText-primary,
+  .MuiListItemText-secondary {
+    color: @dark-text-color;
+  }
+
+  background-color: @dark-card-bg-color;
+}
