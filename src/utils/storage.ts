@@ -141,3 +141,15 @@ export function exportDecks(): string {
   const decks = getDecks();
   return JSON.stringify(decks, null, 2);
 }
+
+export function createDeck(name: string): Deck {
+  const newDeck: Deck = {
+    id: generateId(),
+    name,
+    cards: [],
+  };
+  const decks = getDecks();
+  decks.push(newDeck);
+  saveDecks(decks);
+  return newDeck;
+}

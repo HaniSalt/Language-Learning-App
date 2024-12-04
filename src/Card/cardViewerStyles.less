@@ -157,3 +157,33 @@
     }
   }
 }
+
+body.dark-theme .card-viewer {
+  .card {
+    .card-face {
+      background-color: @dark-card-bg-color;
+      color: @dark-text-color;
+      border-color: @dark-border-color;
+    }
+
+    .flip-button {
+      background-color: @dark-accent-color;
+
+      &:hover {
+        background-color: @dark-accent-color-dark;
+      }
+    }
+  }
+
+  .card-viewer-bottom {
+    .edit-button,
+    .delete-button,
+    .next-button {
+      background-color: @dark-accent-color;
+
+      &:hover {
+        background-color: @dark-accent-color-dark;
+      }
+    }
+  }
+}

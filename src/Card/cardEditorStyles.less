@@ -1,12 +1,53 @@
+@import '../styles/variables.less';
+
 .card-editor-form {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 20px;
-  
-    .card-editor-actions {
-      margin-top: 20px;
-      display: flex;
-      gap: 10px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+
+  h3 {
+    text-align: center;
+    color: @accent-color;
+  }
+
+  .file-inputs {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+
+    label {
+      margin-bottom: 10px;
+
+      input[type='file'] {
+        margin-top: 5px;
+      }
     }
   }
-  
+
+  .card-editor-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+}
+
+body.dark-theme .card-editor-form {
+  background-color: @dark-card-bg-color;
+
+  h3 {
+    color: @dark-accent-color;
+  }
+
+  .MuiTextField-root, /* For Material UI TextField */
+  input,
+  textarea {
+    background-color: @dark-background-color;
+    color: @dark-text-color;
+    border-color: @dark-border-color;
+  }
+
+  label {
+    color: @dark-text-color;
+  }
+}

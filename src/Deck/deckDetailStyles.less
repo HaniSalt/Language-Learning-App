@@ -107,3 +107,21 @@
     gap: 10px;
   }
 }
+
+body.dark-theme .deck-detail .deck-top-bar {
+  background-color: @dark-header-bg-color;
+
+  .deck-title {
+    color: @dark-text-color;
+  }
+
+  .deck-exit {
+    button {
+      background-color: @dark-accent-color;
+
+      &:hover {
+        background-color: @dark-accent-color-dark;
+      }
+    }
+  }
+}
