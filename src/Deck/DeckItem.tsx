@@ -1,4 +1,4 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent } from 'preact';
 import { Deck } from '../utils/storage';
 import { Card, CardActionArea, CardContent, Typography } from '@mui/material';
 
@@ -8,6 +8,9 @@ interface DeckItemProps {
 }
 
 export const DeckItem: FunctionalComponent<DeckItemProps> = ({ deck, onSelect }) => {
+  // Here we implement:
+  // Making a clickable area that selects the deck
+  // Deck name display
   return (
     <Card>
       <CardActionArea onClick={() => onSelect(deck.id)}>

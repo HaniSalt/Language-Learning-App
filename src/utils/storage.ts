@@ -25,7 +25,7 @@ export function getDecks(): Deck[] {
   if (decksJson) {
     return JSON.parse(decksJson);
   } else {
-    // Initialize with sample data
+    // Initialize with sample data (default decks that come with the program)
     const sampleDecks: Deck[] = [
       {
         id: 1,
@@ -44,6 +44,7 @@ export function getDecks(): Deck[] {
         ],
       },
     ];
+    //save the sample decks and return them
     saveDecks(sampleDecks);
     return sampleDecks;
   }
@@ -63,10 +64,13 @@ export function getDeckById(deckId: number): Deck | undefined {
 // Add a new deck
 export function addDeck(name: string): Deck {
   const newDeck: Deck = {
+    //we initilize it with data such as id and name
+    //Always generate a unique id for the new deck
     id: generateId(),
     name,
     cards: [],
   };
+  //push it the deck and save
   const decks = getDecks();
   decks.push(newDeck);
   saveDecks(decks);
@@ -92,8 +96,6 @@ export function deleteDeck(deckId: number): void {
 }
 
 // Add a card to a deck
-// src/utils/storage.ts
-
 export function addCardToDeck(
   deckId: number,
   front: string,
@@ -130,6 +132,7 @@ export function deleteCardFromDeck(deckId: number, cardId: number): void {
   }
 }
 
+// Import deck using a JSON file
 export function importDecks(deckData: Deck[]): void {
   const existingDecks = getDecks();
   const combinedDecks = [...existingDecks, ...deckData];

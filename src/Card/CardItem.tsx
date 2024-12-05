@@ -1,4 +1,4 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
 
 interface CardItemProps {
@@ -8,7 +8,7 @@ interface CardItemProps {
     back: string;
   };
 }
-
+// This class is used for displaying cards (items) and handles flipping cards.
 export const CardItem: FunctionalComponent<CardItemProps> = ({ card }) => {
   const [showBack, setShowBack] = useState(false);
 

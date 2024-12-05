@@ -13,6 +13,7 @@ export const DeckEditor: FunctionalComponent<DeckEditorProps> = ({ deckId }) => 
     console.log('Saving deck:', deckId, deckName);
   };
 
+  // Displays the edit name deck part and save the new name.
   return (
     <div>
       <h2>Edit Deck</h2>

@@ -1,8 +1,4 @@
-/* deckDetailStyles.less */
-
-@import '../styles/variables.less';
-
-/* Correct comment syntax and variable usage */
+@import '../styles/variables.less'; // Imports color and style variables
 
 .deck-detail {
   display: flex;
@@ -71,13 +67,13 @@
 
     .options-dropdown {
       position: absolute;
-      bottom: 50px; /* Position above the bottom bar */
+      bottom: 50px; /* Positions the dropdown above the bottom bar */
       left: 0;
       background-color: #fff;
       border: 1px solid @border-color;
       border-radius: 4px;
       overflow: hidden;
-      z-index: 1000;
+      z-index: 1000; /* Ensures dropdown appears above other elements */
 
       button {
         display: block;
@@ -95,6 +91,8 @@
     }
   }
 }
+
+/* Styles for the deck name editing form */
 .edit-deck-name-form {
   display: flex;
   flex-direction: column;
@@ -108,6 +106,7 @@
   }
 }
 
+/* Dark theme styles */
 body.dark-theme .deck-detail .deck-top-bar {
   background-color: @dark-header-bg-color;
 

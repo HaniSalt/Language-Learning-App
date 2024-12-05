@@ -1,5 +1,3 @@
-// src/App.tsx
-
 import { FunctionalComponent, h } from 'preact';
 import { useState } from 'preact/hooks';
 import { Header } from './UI/Header';
@@ -11,10 +9,15 @@ import { AnalyticsDashboard } from './Settings/AnalyticsDashboard';
 import { Settings } from './Settings/Settings';
 import './styles/globalStyles.less';
 
+
+//The root component of the application
 const App: FunctionalComponent = () => {
   const [page, setPage] = useState('home');
   const [selectedDeckId, setSelectedDeckId] = useState<number | null>(null);
 
+  // Using a simple switch case structure it 
+  // manages global state and renders the appropriate page based on the current state.
+  // There are 4 different pages that we could access, home, decks, analytics and settings
   const renderPage = () => {
     switch (page) {
       case 'home':

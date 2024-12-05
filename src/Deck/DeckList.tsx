@@ -11,12 +11,15 @@ interface DeckListProps {
 }
 
 export const DeckList: FunctionalComponent<DeckListProps> = ({ setSelectedDeckId }) => {
+  // Holds the list of decks
   const [decks, setDecks] = useState<Deck[]>([]);
 
+  // Loads decks from storage on mount
   useEffect(() => {
     setDecks(getDecks());
   }, []);
 
+  // Adds a new deck
   const handleAddDeck = () => {
     const deckName = prompt('Enter deck name:');
     if (deckName) {
@@ -25,6 +28,10 @@ export const DeckList: FunctionalComponent<DeckListProps> = ({ setSelectedDeckId
     }
   };
 
+  // Consists of multiple parts:
+  // Page title and add deck button 
+  // Import/Export functionality
+  // Finally grid of deck items
   return (
     <Container className="deck-list">
       <Typography variant="h4" component="h2" gutterBottom>

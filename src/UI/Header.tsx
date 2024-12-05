@@ -1,6 +1,7 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent} from 'preact';
 import { useState } from 'preact/hooks';
 import './headerStyles.less';
+import logo from '../assets/logo.png';
 
 interface HeaderProps {
   page: string;
@@ -9,16 +10,17 @@ interface HeaderProps {
 
 export const Header: FunctionalComponent<HeaderProps> = ({ page, setPage }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  // Navigates to a new page and closes the menu
   const handleNavigation = (newPage: string) => {
     setPage(newPage);
     setMenuOpen(false);
   };
 
+  // Load in the logo and handle the navigation between the different pages.
   return (
     <header class="header">
       <div class="logo">
-        <img src="/assets/logo.png" alt="App Logo" />
+        <img src={logo} alt="App Logo" />
       </div>
       <nav class={`nav ${menuOpen ? 'open' : ''}`}>
         <ul>

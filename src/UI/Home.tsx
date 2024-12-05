@@ -1,20 +1,13 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent} from 'preact';
 import './homeStyles.less';
-import { route } from 'preact-router';
 
 export const Home: FunctionalComponent = () => {
-  const goToDecks = () => {
-    route('/decks');
-    window.location.href = '/decks';
-  };
-
+  // Displays the basic information on the home page
+  // Things such as welcomming the user and informing them about features.
   return (
     <main class="home">
       <h1>Welcome to the Language Learning App</h1>
       <p>Start creating and studying your flashcards today!</p>
-      <div class="cta-buttons">
-        <button onClick={goToDecks}>Browse Decks</button>
-      </div>
       <div class="features">
         <div class="feature">
           <h3>Create Custom Decks</h3>
