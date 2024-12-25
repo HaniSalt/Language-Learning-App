@@ -1,4 +1,4 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent } from 'preact';
 import { useState, useRef } from 'preact/hooks';
 import { TextField, Button } from '@mui/material';
 import { addCardToDeck, getDeckById, Deck } from '../utils/storage';

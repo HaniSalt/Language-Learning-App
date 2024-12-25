@@ -1,4 +1,4 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent } from 'preact';
 import { DeckItem } from './DeckItem';
 import { getDecks, Deck, createDeck } from '../utils/storage';
 import { useState, useEffect } from 'preact/hooks';

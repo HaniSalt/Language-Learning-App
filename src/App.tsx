@@ -1,4 +1,4 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
 import { Header } from './UI/Header';
 import { Footer } from './UI/Footer';

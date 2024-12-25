@@ -1,4 +1,4 @@
-import { FunctionalComponent, h } from 'preact';
+import { FunctionalComponent} from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { Deck, Card, updateDeck } from '../utils/storage';
 import './cardViewerStyles.less';
