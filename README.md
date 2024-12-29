@@ -1,4 +1,4 @@
-# <Flashcards App>
+# Flashcards App
 A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
 
 ## Table of Contents
@@ -9,27 +9,28 @@ A Preact-based flashcard application designed for language learning, featuring d
 
 ## Features
 ### Deck Management
-Create, edit, and delete decks.
+<u>Create, edit, and delete decks.</u>
 Add new cards with front/back text, images, and audio.
 Persist data in localStorage.
 Card Viewer
 
-Flip cards to reveal the back.
+<u>Flip cards to reveal the back.</u>
 Attached images and audio playback within each card.
 Edit individual cards at any time.
 Import/Export Decks
 
-Import existing decks from a JSON file.
+<u>Import existing decks from a JSON file.</u>
 Export all decks to a JSON file for backup or sharing.
 Dark Theme
 
-Switch between light and dark themes.
+<u>Switch between light and dark themes.</u>
 Respects custom CSS variables and MUI theming.
-Material-UI Integration
 
+<u>Material-UI Integration</u>
 Consistent UI components, including buttons, text fields, and icons.
 Responsive design using MUI’s grid system.
-Analytics
+
+<u>Analytics</u>
 Provide an overview of total decks, total cards, and more.
 
 ## Installation
@@ -60,7 +61,7 @@ Use Export to download all decks as a JSON file for backup or sharing.
 Theme Toggle:
 Switch between light/dark mode in the settings.
 
-Technologies & APIs Used
+## Technologies & APIs Used
 Preact: Core library for building performant, lightweight UI components.
 TypeScript: Because it provides type safety and improved developer experience.
 Material-UI (MUI): Offers a consistent and responsive UI, including icon sets.
