@@ -1,18 +1,16 @@
 # Flashcards App
-## A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
+### A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
 
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
-- [Usage]
-- [Project Structure]
-- [Technologies & APIs Used]
-- [Contributing]
-- [License]
-- [Features]
-- [Deck Management]
+- [Usage](#usage)
+- [Project Structure](#projectStructure)
+- [Technologies & APIs Used](#tech&Api)
+- [Contributing](#contributing)
 
 ## Features
+### Deck Management
 Create, edit, and delete decks.
 Add new cards with front/back text, images, and audio.
 Persist data in localStorage.
@@ -33,24 +31,19 @@ Material-UI Integration
 
 Consistent UI components, including buttons, text fields, and icons.
 Responsive design using MUI’s grid system.
-Analytics (Optional)
+Analytics
+Provide an overview of total decks, total cards, and more.
 
-(If enabled) Provide an overview of total decks, total cards, and more.
-Installation
-Clone the Repository:
-bash
-Copy code
-git clone https://github.com/YourUsername/flashcards-app.git
-Install Dependencies:
-bash
-Copy code
-cd flashcards-app
+## Installation
+### Clone the Repository: git clone https://github.com/HaniSalt/Language-Learning-App.git
+### Install Dependencies:
+cd C:\location-where-installed
 npm install
-Start the Development Server:
-bash
-Copy code
+
+### Start the Development Server:
 npm run dev
-Usage
+
+## Usage
 Creating a New Deck:
 
 Navigate to Your Decks and click Add New Deck.
