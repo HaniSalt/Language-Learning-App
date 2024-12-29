@@ -1,13 +1,11 @@
-# Flashcards App
-### A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
+# <Flashcards App>
+A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
 
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Project Structure](#projectStructure)
 - [Technologies & APIs Used](#tech&Api)
-- [Contributing](#contributing)
 
 ## Features
 ### Deck Management
@@ -44,62 +42,28 @@ npm install
 npm run dev
 
 ## Usage
-Creating a New Deck:
-
-Navigate to Your Decks and click Add New Deck.
+Creating a New Deck: Navigate to Your Decks and click Add New Deck.
 Enter a name for your deck and confirm.
-Adding Cards:
 
+Adding Cards: 
 Open a deck and click Add New Card.
 Fill in the front/back text, upload an optional image or audio file, then save.
-Editing a Deck:
 
-Click Edit Deck Name to rename a deck.
+Editing a Deck: 
+Click Edit Deck Name to rename a deck. 
 Or edit individual cards from the card viewer.
-Import/Export:
 
+Import/Export:
 Use Import to load decks from a JSON file.
 Use Export to download all decks as a JSON file for backup or sharing.
-Theme Toggle:
 
-Switch between light/dark mode in the settings or via the theme toggle button.
-Refresh the page if needed (depending on your implementation) to fully apply the theme.
-Project Structure
-lua
-Copy code
-flashcards-app/
-├── src/
-│   ├── Card/
-│   │   ├── CardViewer.tsx
-│   │   ├── CardEditor.tsx
-│   │   └── cardViewerStyles.less
-│   ├── Deck/
-│   │   ├── DeckList.tsx
-│   │   ├── DeckDetail.tsx
-│   │   ├── DeckItem.tsx
-│   │   └── deckListStyles.less
-│   ├── Settings/
-│   │   └── ThemeToggle.tsx
-│   ├── utils/
-│   │   └── storage.ts
-│   ├── App.tsx
-│   ├── index.tsx
-│   └── styles/
-│       ├── variables.less
-│       └── globalStyles.less
-├── package.json
-├── tsconfig.json
-├── vite.config.js
-└── README.md
+Theme Toggle:
+Switch between light/dark mode in the settings.
+
 Technologies & APIs Used
 Preact: Core library for building performant, lightweight UI components.
-TypeScript: Provides type safety and improved developer experience.
+TypeScript: Because it provides type safety and improved developer experience.
 Material-UI (MUI): Offers a consistent and responsive UI, including icon sets.
 LocalStorage: Persists decks and cards offline.
 FileReader & Blob APIs: Enables importing/exporting JSON files and reading media files for cards.
 CSS/LESS: Custom styling with variables for theming, plus MUI theming for UI consistency.
-Contributing
-Fork the repository and create a new branch.
-Implement your feature or bug fix.
-Open a Pull Request describing your changes.
-Please adhere to the style and structure where possible, and add testing for your features when relevant.
