@@ -1,17 +1,18 @@
-Flashcards App
-A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
+# Flashcards App
+## A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
 
-Table of Contents
-Features
-Installation
-Usage
-Project Structure
-Technologies & APIs Used
-Contributing
-License
-Features
-Deck Management
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Usage]
+- [Project Structure]
+- [Technologies & APIs Used]
+- [Contributing]
+- [License]
+- [Features]
+- [Deck Management]
 
+## Features
 Create, edit, and delete decks.
 Add new cards with front/back text, images, and audio.
 Persist data in localStorage.
