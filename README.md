@@ -9,22 +9,21 @@ A Preact-based flashcard application designed for language learning, featuring d
 
 ## Features
 ### Deck Management
-<u>Create, edit, and delete decks.</u>
+<u>Create, edit, and delete decks:</u>
 Add new cards with front/back text, images, and audio.
 Persist data in localStorage.
 Card Viewer
 
-<u>Flip cards to reveal the back.</u>
+<u>Flip cards to reveal the back:</u>
 Attached images and audio playback within each card.
 Edit individual cards at any time.
 Import/Export Decks
 
-<u>Import existing decks from a JSON file.</u>
+<u>Import existing decks from a JSON file:</u>
 Export all decks to a JSON file for backup or sharing.
-Dark Theme
 
-<u>Switch between light and dark themes.</u>
-Respects custom CSS variables and MUI theming.
+<u>Dark Theme:</u>
+Switch between light and dark themes using custom CSS variables and MUI theming.
 
 <u>Material-UI Integration</u>
 Consistent UI components, including buttons, text fields, and icons.
@@ -34,7 +33,8 @@ Responsive design using MUI’s grid system.
 Provide an overview of total decks, total cards, and more.
 
 ## Installation
-### Clone the Repository: git clone https://github.com/HaniSalt/Language-Learning-App.git
+### Clone the Repository: 
+"git clone https://github.com/HaniSalt/Language-Learning-App.git"
 ### Install Dependencies:
 cd C:\location-where-installed
 npm install
