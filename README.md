@@ -63,8 +63,13 @@ Switch between light/dark mode in the settings.
 
 ## Technologies & APIs Used
 Preact: Core library for building performant, lightweight UI components.
+
 TypeScript: Because it provides type safety and improved developer experience.
+
 Material-UI (MUI): Offers a consistent and responsive UI, including icon sets.
+
 LocalStorage: Persists decks and cards offline.
+
 FileReader & Blob APIs: Enables importing/exporting JSON files and reading media files for cards.
+
 CSS/LESS: Custom styling with variables for theming, plus MUI theming for UI consistency.
