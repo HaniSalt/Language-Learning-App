@@ -1,6 +1,6 @@
 import { FunctionalComponent } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { getDecks, Deck } from '../utils/storage';
+import { getDecks, Deck } from '../../utils/storage';
 import { Container, Typography, List, ListItem, ListItemText } from '@mui/material';
 import './analyticsDashboardStyles.less';
 

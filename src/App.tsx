@@ -1,12 +1,12 @@
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
-import { Header } from './UI/Header';
-import { Footer } from './UI/Footer';
-import { Home } from './UI/Home';
-import { DeckList } from './Deck/DeckList';
-import { DeckDetail } from './Deck/DeckDetail';
-import { AnalyticsDashboard } from './Settings/AnalyticsDashboard';
-import { Settings } from './Settings/Settings';
+import { Header } from './components/UI/Header';
+import { Footer } from './components/UI/Footer';
+import { Home } from './pages/Home';
+import { DeckList } from './components/Deck/DeckList';
+import { DeckDetail } from './components/Deck/DeckDetail';
+import { AnalyticsDashboard } from './components/Settings/AnalyticsDashboard';
+import { Settings } from './components/Settings/Settings';
 import './styles/globalStyles.less';
 
 

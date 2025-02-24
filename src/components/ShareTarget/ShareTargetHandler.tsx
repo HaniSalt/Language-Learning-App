@@ -1,6 +1,6 @@
 import { FunctionalComponent } from 'preact';
 import { useEffect } from 'preact/hooks';
-import { importDecks, Deck } from '../utils/storage';
+import { importDecks, Deck } from '../../utils/storage';
 
 // ShareTargetHandler component definition
 export const ShareTargetHandler: FunctionalComponent = () => {

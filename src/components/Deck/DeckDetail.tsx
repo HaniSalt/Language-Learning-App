@@ -2,7 +2,7 @@ import { FunctionalComponent} from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { CardViewer } from '../Card/CardViewer';
 import { CardEditor } from '../Card/CardEditor';
-import { getDeckById, deleteDeck, updateDeck, Deck } from '../utils/storage';
+import { getDeckById, deleteDeck, updateDeck, Deck } from '../../utils/storage';
 import './deckDetailStyles.less';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';

@@ -1,7 +1,7 @@
 import { FunctionalComponent} from 'preact';
 import { useState } from 'preact/hooks';
 import './headerStyles.less';
-import logo from '../assets/logo.png';
+import logo from '../../assets/logo.png';
 
 interface HeaderProps {
   page: string;

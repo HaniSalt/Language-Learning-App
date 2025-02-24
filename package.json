@@ -12,13 +12,26 @@
 		"@fortawesome/fontawesome-free": "^6.7.0",
 		"@mui/icons-material": "^6.1.9",
 		"@mui/material": "^6.1.9",
+		"@trpc/client": "^10.45.2",
+		"@trpc/server": "^10.45.2",
+		"firebase": "^11.3.1",
+		"firebase-admin": "^13.1.0",
+		"language-learning-app": "file:",
 		"preact": "^10.22.1",
-		"preact-router": "^4.1.2"
+		"preact-router": "^4.1.2",
+		"superjson": "^2.2.2",
+		"zod": "^3.24.2"
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.9.0",
 		"less": "^4.2.0",
 		"typescript": "^5.6.3",
 		"vite": "^5.3.3"
-	}
+	},
+	"name": "language-learning-app",
+	"version": "1.0.0",
+	"description": "A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.",
+	"main": "index.js",
+	"author": "",
+	"license": "ISC"
 }

@@ -1,6 +1,6 @@
 import { FunctionalComponent } from 'preact';
 import { DeckItem } from './DeckItem';
-import { getDecks, Deck, createDeck } from '../utils/storage';
+import { getDecks, Deck, createDeck } from '../../utils/storage';
 import { useState, useEffect } from 'preact/hooks';
 import { Container, Typography, Grid, Button } from '@mui/material';
 import { ImportExport } from './ImportExport';

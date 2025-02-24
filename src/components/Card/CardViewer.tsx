@@ -1,6 +1,6 @@
 import { FunctionalComponent} from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { Deck, Card, updateDeck } from '../utils/storage';
+import { Deck, Card, updateDeck } from "../../utils/storage";
 import './cardViewerStyles.less';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';

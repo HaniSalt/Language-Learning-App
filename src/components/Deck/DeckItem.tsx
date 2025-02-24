@@ -1,5 +1,5 @@
 import { FunctionalComponent } from 'preact';
-import { Deck } from '../utils/storage';
+import { Deck } from '../../utils/storage';
 import { Card, CardActionArea, CardContent, Typography } from '@mui/material';
 
 interface DeckItemProps {

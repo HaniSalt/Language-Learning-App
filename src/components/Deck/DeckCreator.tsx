@@ -1,6 +1,6 @@
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
-import { addDeck } from '../utils/storage';
+import { addDeck } from '../../utils/storage';
 
 interface DeckCreatorProps {
   onDeckCreated: (deckId: number) => void; // Callback function to notify when a new deck is created

@@ -1,5 +1,5 @@
 import { FunctionalComponent } from 'preact';
-import { importDecks, exportDecks, Deck } from '../utils/storage';
+import { importDecks, exportDecks, Deck } from '../../utils/storage';
 import { useRef } from 'preact/hooks';
 import './importExportStyles.less';
 
