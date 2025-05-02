@@ -6,10 +6,12 @@ import logo from '../../assets/logo.png';
 interface HeaderProps {
   page: string;
   setPage: (page: string) => void;
+  isLoggedIn?: boolean; // New prop to check if user is logged in
 }
 
-export const Header: FunctionalComponent<HeaderProps> = ({ page, setPage }) => {
+export const Header: FunctionalComponent<HeaderProps> = ({ page, setPage, isLoggedIn = false }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+
   // Navigates to a new page and closes the menu
   const handleNavigation = (newPage: string) => {
     setPage(newPage);
@@ -58,6 +60,23 @@ export const Header: FunctionalComponent<HeaderProps> = ({ page, setPage }) => {
           </li>
         </ul>
       </nav>
+      <div class="auth-buttons">
+        {isLoggedIn ? (
+          <button
+            class={`profile-btn ${page === 'profile' ? 'active' : ''}`}
+            onClick={() => handleNavigation('profile')}
+          >
+            Profile
+          </button>
+        ) : (
+          <button
+            class={`register-btn ${page === 'register' ? 'active' : ''}`}
+            onClick={() => handleNavigation('register')}
+          >
+            Login / Register
+          </button>
+        )}
+      </div>
       <button class="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
         &#9776;
       </button>

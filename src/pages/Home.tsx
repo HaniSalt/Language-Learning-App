@@ -1,5 +1,5 @@
 import { FunctionalComponent} from 'preact';
-import './homeStyles.less';
+import "../components/UI/homeStyles.less";
 
 export const Home: FunctionalComponent = () => {
   // Displays the basic information on the home page
