@@ -4,7 +4,9 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"dev:server": "tsx watch server/trpcServer.ts",
+		"start:server": "node dist-server/trpcServer.js"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.13.5",
@@ -33,6 +35,7 @@
 		"less": "^4.3.0",
 		"less-loader": "^12.2.0",
 		"ts-node-dev": "^2.0.0",
+		"tsx": "^4.19.4",
 		"typescript": "^5.8.3",
 		"vite": "^5.3.3"
 	},
