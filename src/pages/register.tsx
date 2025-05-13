@@ -1,5 +1,3 @@
-// pages/register.tsx
-
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
 import { docreateUserWithEmailAndPassword, doSignInWithEmailAndPassword } from '../firebase/auth';

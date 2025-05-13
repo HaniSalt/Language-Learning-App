@@ -1,5 +1,3 @@
-// components/Profile/Profile.tsx
-
 import { FunctionalComponent } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { doSignOut } from '../firebase/auth';
