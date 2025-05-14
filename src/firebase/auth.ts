@@ -21,6 +21,8 @@ export const doPasswordChange = (password) => {
     return updatePassword(auth.currentUser, password)
 }
 
+
+export { auth };
 // export const doSendEmailVerification = async () => {
 //     return auth.currentUser.sendEmailVerification()
 // }

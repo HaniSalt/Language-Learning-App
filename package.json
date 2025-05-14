@@ -5,8 +5,9 @@
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"dev:server": "tsx watch server/trpcServer.ts",
-		"start:server": "node dist-server/trpcServer.js"
+		"dev:server": "ts-node-dev --respawn --transpile-only server/index.ts",
+		"build:server": "tsc -p tsconfig.server.json",
+		"start:server": "node dist/server/index.js"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.13.5",
@@ -14,8 +15,9 @@
 		"@fortawesome/fontawesome-free": "^6.7.0",
 		"@mui/icons-material": "^6.1.9",
 		"@mui/material": "^6.1.9",
-		"@tanstack/react-query": "^5.75.5",
+		"@tanstack/react-query": "^5.76.1",
 		"@trpc/client": "^10.45.2",
+		"@trpc/react-query": "^11.1.2",
 		"@trpc/server": "^10.45.2",
 		"cors": "^2.8.5",
 		"dotenv": "^16.5.0",

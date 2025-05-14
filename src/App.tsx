@@ -1,8 +1,5 @@
 import { FunctionalComponent } from 'preact';
-import { useState, useEffect, useMemo } from 'preact/hooks'; // Added useMemo
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink, loggerLink } from '@trpc/client'; // Added loggerLink (optional)
-import { trpc } from './services/trpc/trpc';
+import { useState, useEffect } from 'preact/hooks';
 import { Header } from './components/UI/Header';
 import { Footer } from './components/UI/Footer';
 import { Home } from './pages/Home';
@@ -12,137 +9,127 @@ import { AnalyticsDashboard } from './components/Settings/AnalyticsDashboard';
 import { Settings } from './components/Settings/Settings';
 import Register from './pages/register';
 import Profile from './pages/profile';
-import { onAuthStateChanged, getIdToken } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth'; // Updated import for User type
 import { auth } from './firebase/firebase';
 import './styles/globalStyles.less';
 
+// The root component of the application
 const App: FunctionalComponent = () => {
-  const [page, setPage] = useState('home');
-  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null); // MongoDB IDs are typically strings
+  const [page, setPage] = useState('home'); // Initial page
+  const [selectedDeckId, setSelectedDeckId] = useState<number | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Renamed for clarity
-  const [firebaseUser, setFirebaseUser] = useState<any | null>(null); // Store user object
-
-  // Memoize QueryClient to prevent re-creation on every render
-  const queryClient = useMemo(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        // Configure other defaults as needed
-      },
-    },
-  }), []);
-
-  // Memoize and manage tRPC client, recreate if auth token changes
-  const trpcClient = useMemo(() => {
-    return trpc.createClient({
-      links: [
-        // Optional: Logger link for development, shows tRPC requests in console
-        loggerLink({
-          enabled: (opts) =>
-            (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') ||
-            (opts.direction === 'down' && opts.result instanceof Error),
-        }),
-        httpBatchLink({
-          url: process.env.PREACT_APP_TRPC_URL || 'http://localhost:3001/trpc', // Use env variable
-          async headers() {
-            const headers: Record<string, string> = {};
-            if (firebaseUser) {
-              try {
-                const token = await getIdToken(firebaseUser);
-                headers['Authorization'] = `Bearer ${token}`;
-              } catch (error) {
-                console.error('Failed to get Firebase ID token:', error);
-                // Handle error, maybe sign out user or clear token
-              }
-            }
-            return headers;
-          },
-        }),
-      ],
-    });
-  }, [firebaseUser]); // Recreate client if firebaseUser changes (e.g., token might be new)
-
+  const [currentUser, setCurrentUser] = useState<User | null>(null); // Store current user (optional)
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Loading state for auth check
 
   useEffect(() => {
+    // Listen for authentication state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setFirebaseUser(user); // Store the whole user object
-      setIsLoggedIn(!!user);
-      setIsLoadingAuth(false);
+      if (user) {
+        // User is signed in
+        setIsLoggedIn(true);
+        setCurrentUser(user);
+        // If user is logged in and on the register page, redirect to home or profile
+        if (page === 'register') {
+          setPage('home'); // Or 'profile'
+        }
+      } else {
+        // User is signed out
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        // If user is signed out, and was on a page that requires login, redirect to register
+        const protectedPages = ['decks', 'analytics', 'settings', 'profile'];
+        if (protectedPages.includes(page)) {
+          setPage('register');
+        } else if (page === 'profile') { // Specifically handle if on profile page when logged out
+            setPage('register');
+        }
+      }
+      setIsLoadingAuth(false); // Finished checking auth state
     });
+
+    // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, []);
+  }, [page]); // Add page to dependencies to re-evaluate redirects if page changes externally
 
-  const navigateTo = (newPage: string) => {
-    setPage(newPage);
-    if (newPage !== 'decks' && newPage !== 'deck-detail') { // Ensure DeckDetail also doesn't reset
-      setSelectedDeckId(null);
-    }
-  };
-
-  const handleSelectDeck = (deckId: string) => {
-    setSelectedDeckId(deckId);
-    setPage('deck-detail'); // Navigate to deck detail page
-  };
-
+  // Manages global state and renders the appropriate page
   const renderPage = () => {
     if (isLoadingAuth) {
-      return <div className="loading">Authenticating...</div>;
+      return <div>Loading application...</div>; // Or a more sophisticated loading component
     }
+
     switch (page) {
       case 'home':
         return <Home />;
       case 'decks':
-        return <DeckList onSelectDeck={handleSelectDeck} />; // Pass handler
-      case 'deck-detail':
-        if (selectedDeckId) {
+        if (!isLoggedIn) {
+          setPage('register'); // Redirect to register
+          // Return Register here for immediate render or null/loading while redirect happens
+          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+        }
+        if (selectedDeckId !== null) {
           return (
             <DeckDetail
               deckId={selectedDeckId}
-              onBack={() => {
-                setSelectedDeckId(null);
-                setPage('decks'); // Go back to deck list
-              }}
+              onBack={() => setSelectedDeckId(null)}
             />
           );
+        } else {
+          return <DeckList setSelectedDeckId={setSelectedDeckId} />;
         }
-        navigateTo('decks'); // If no selectedDeckId, go back to list
-        return null;
       case 'analytics':
+        if (!isLoggedIn) {
+          setPage('register');
+          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+        }
         return <AnalyticsDashboard />;
       case 'settings':
+        if (!isLoggedIn) {
+          setPage('register');
+          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+        }
         return <Settings />;
       case 'register':
+        // If user is already logged in, don't show register page, redirect to home/profile
         if (isLoggedIn) {
-          navigateTo('home');
-          return null; // Avoid rendering Register if navigating away
+          setPage('home'); // Or 'profile'
+          return <Home />; // Or <Profile />
         }
-        return <Register setPage={navigateTo} setIsLoggedIn={setIsLoggedIn} />;
+        return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
       case 'profile':
         if (!isLoggedIn) {
-          navigateTo('register');
-          return null; // Avoid rendering Profile if navigating away
+          setPage('register');
+          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
         }
-        return <Profile />;
+        // Pass currentUser if Profile component needs it, though it can also get it from auth.currentUser
+        return <Profile /* currentUser={currentUser} */ />;
       default:
-        return <Home />;
+        // Fallback to home or register depending on login state
+        setPage(isLoggedIn ? 'home' : 'register');
+        return isLoggedIn ? <Home /> : <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
     }
   };
 
+  // Handles page navigation, including auth-related redirects
+  const handleSetPage = (newPage: string) => {
+    // If trying to go to 'register' while logged in, redirect to 'profile' or 'home'
+    if (newPage === 'register' && isLoggedIn) {
+      setPage('profile'); // Or 'home'
+    } else {
+      setPage(newPage);
+    }
+    setSelectedDeckId(null); // Reset selected deck when changing pages
+  };
+
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <div class="app-container">
-          <Header
-            page={page}
-            setPage={navigateTo}
-            isLoggedIn={isLoggedIn}
-          />
-          <div class="content-container">{renderPage()}</div>
-          <Footer />
-        </div>
-      </QueryClientProvider>
-    </trpc.Provider>
+    <div class="app-container">
+      <Header
+        page={page}
+        setPage={handleSetPage} // Use the new handler for navigation
+        isLoggedIn={isLoggedIn} // Pass the login status to the Header
+      />
+      <div class="content-container">{renderPage()}</div>
+      <Footer />
+    </div>
   );
 };
 

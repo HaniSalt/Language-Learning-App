@@ -9,10 +9,6 @@ export const createContext = async ({
   req,
   res,
 }: CreateExpressContextOptions) => {
-  // For now, let's assume you'll add Firebase Admin SDK for verifying tokens later
-  // and extracting the Firebase UID server-side.
-  // For simplicity, we'll start without user authentication in the context.
-  // We will add user handling later.
 
   const mongoClient = new MongoClient(process.env.ATLAS_URI!);
   await mongoClient.connect();
@@ -23,7 +19,6 @@ export const createContext = async ({
     res,
     db,
     mongoClient,
-    // firebaseUid: null, // Placeholder for Firebase UID
   };
 };
 
