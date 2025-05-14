@@ -1,14 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { appRouter } from './routers/_app'; // Ensure these exist
-import { createContext } from './context';   // Ensure these exist
+import { appRouter } from './routers/_app';
+import { createContext } from './context';
 import dotenv from 'dotenv';
 import path from 'path';
 
 import cjsDbConnect from './connect.cjs';
 
-// Destructure the functions from the default import
 const { connectToServer, getDb } = cjsDbConnect;
 
 dotenv.config({ path: path.resolve(__dirname, './config.env') });
@@ -23,7 +22,6 @@ app.use(
     '/trpc',
     createExpressMiddleware({
         router: appRouter,
-        // createContext will now rely on 'getDb' imported from the CJS module
         createContext: (opts) => createContext(opts, getDb),
     })
 );
@@ -31,8 +29,6 @@ app.use(
 async function startServer() {
     try {
         console.log('Starting server...');
-        // Call the connectToServer function from connect.cjs
-        // Make sure it's typed correctly if possible (see step 2a)
         await (connectToServer as () => Promise<void>)();
 
         app.listen(port, () => {

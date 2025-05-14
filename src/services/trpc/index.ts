@@ -1,15 +1,13 @@
     import { createTRPCReact, httpBatchLink, loggerLink } from '@trpc/react-query';
-    import type { AppRouter } from '../../../server/routers/_app'; // Adjust path to your server's AppRouter
-    import { AuthContextType, useAuth } from '../../contexts/authContexts/index'; // Import your auth context
-    import superjson from 'superjson'; // If you used it on the server
+    import type { AppRouter } from '../../../server/routers/_app';
+    import { AuthContextType, useAuth } from '../../contexts/authContexts/index';
+    import superjson from 'superjson';
 
     export const trpc = createTRPCReact<AppRouter>();
 
-    // This function will be used to create the trpcClient instance dynamically
-    // based on the auth state.
     export const createTrpcClient = (getAuthToken: () => Promise<string | null>) => {
     return trpc.createClient({
-        transformer: superjson, // Make sure this matches server transformer
+        transformer: superjson,
         links: [
         loggerLink({
             enabled: (opts) =>
