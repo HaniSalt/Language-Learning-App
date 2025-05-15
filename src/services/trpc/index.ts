@@ -1,12 +1,14 @@
-    import { createTRPCReact, httpBatchLink, loggerLink } from '@trpc/react-query';
-    import type { AppRouter } from '../../../server/routers/_app';
-    import { AuthContextType, useAuth } from '../../contexts/authContexts/index';
-    import superjson from 'superjson';
+import { createTRPCReact, httpBatchLink, loggerLink } from '@trpc/react-query';
+import type { AppRouter } from '../../../server/routers/_app';
+import { AuthContextType, useAuth } from '../../contexts/authContexts/index';
+import superjson from 'superjson';
 
-    export const trpc = createTRPCReact<AppRouter>();
+export const trpc = createTRPCReact<AppRouter>();
 
-    export const createTrpcClient = (getAuthToken: () => Promise<string | null>) => {
-    return trpc.createClient({
+export const createTrpcClient = (getAuthToken: () => Promise<string | null>) => 
+    {
+    return trpc.createClient
+    ({
         transformer: superjson,
         links: [
         loggerLink({
@@ -28,4 +30,4 @@
         }),
         ],
     });
-    };
+};

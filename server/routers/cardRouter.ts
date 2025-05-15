@@ -67,4 +67,53 @@ export const cardRouter = router({
       }
       return { success: true, cardId: newCard.id };
     }),
+
+  deleteDeck: protectedProcedure
+    .input(z.object({ deckId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      const result = await db.collection('CardData').deleteOne({
+        id: input.deckId,
+        userId: ctx.user.uid,
+      });
+
+      if (result.deletedCount === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Deck not found or you do not have permission to delete it.',
+        });
+      }
+      return { success: true, deletedDeckId: input.deckId };
+    }),
+
+  updateDeckName: protectedProcedure
+    .input(z.object({
+      deckId: z.string(),
+      name: z.string().min(1),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      const filter = { id: input.deckId, userId: ctx.user.uid };
+      const update = { $set: { name: input.name } };
+
+      const result = await db.collection('CardData').updateOne(filter, update);
+
+      if (result.matchedCount === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Deck not found or you do not have permission to edit it.',
+        });
+      }
+
+      if (result.modifiedCount === 0 && result.matchedCount === 1) {
+        
+      }
+
+      const updatedDeck = await db.collection('CardData').findOne(filter);
+      if (!updatedDeck) {
+         // Should not happen if matchedCount was 1, but as a safeguard
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to retrieve updated deck.' });
+      }
+      return updatedDeck;
+    }),
 });
