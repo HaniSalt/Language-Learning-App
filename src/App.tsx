@@ -10,149 +10,133 @@ import { Settings } from './components/Settings/Settings';
 import Register from './pages/register';
 import Profile from './pages/profile';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from './firebase/firebase'; // Your firebase auth instance
+import { auth } from './firebase/firebase';
+import './styles/globalStyles.less';
 import './styles/globalStyles.less';
 
-// tRPC and React Query imports
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// Assuming your services/trpc/index.ts is correctly set up for Preact
-// For Preact, ensure createTRPCReact is used correctly, or if you need a specific Preact adapter for react-query.
-// The provided `createTRPCReact` should generally work.
-import { trpc, createTrpcClient } from './services/trpc/index'; // Adjust path as per your project structure
+import { httpBatchLink, loggerLink } from '@trpc/client';
+import { trpc } from './services/trpc/index';
+import superjson from 'superjson';
 
 const App: FunctionalComponent = () => {
   const [page, setPage] = useState('home');
-  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null); // Deck IDs from your backend are strings
+  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This will be derived from currentUser
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Memoize QueryClient instance
-  const queryClient = useMemo(() => new QueryClient(), []);
+  const queryClient = useMemo(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5,
+        refetchOnWindowFocus: false,
+      },
+    },
+  }), []);
 
-  // Memoize tRPC client instance. It will be recreated if the currentUser changes.
-  const trpcClient = useMemo(() => {
-    // This function will be called by tRPC's httpBatchLink to get the auth token
-    const getAuthToken = async (): Promise<string | null> => {
-      if (auth.currentUser) { // Use your actual Firebase auth instance
-        try {
-          return await auth.currentUser.getIdToken(true); // Force refresh the token if near expiry
-        } catch (error) {
-          console.error("Error getting ID token:", error);
-          // Potentially handle token refresh errors, e.g., by signing the user out
-          return null;
-        }
-      }
-      return null;
-    };
-    return createTrpcClient(getAuthToken);
-  }, [currentUser]); // Dependency on currentUser ensures client is updated on auth state change
+  const trpcClient = useMemo(() =>
+    trpc.createClient({
+      links: [
+        loggerLink({
+          enabled: (opts) =>
+            process.env.NODE_ENV === 'development' ||
+            (opts.direction === 'down' && opts.result instanceof Error),
+        }),
+        httpBatchLink({
+          url: process.env.REACT_APP_TRPC_URL || 'http://localhost:3001/trpc',
+        }),
+      ],
+      transformer: superjson, // <--- ADD THE TRANSFORMER HERE
+    }),
+    []
+  );
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => { // Use your actual Firebase auth instance
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      setIsLoggedIn(!!user); // Update isLoggedIn based on user presence
+      setIsLoggedIn(!!user);
       setIsLoadingAuth(false);
 
       if (user) {
-        // User is logged in
-        if (page === 'register') {
-          setPage('home'); // Redirect from register to home if logged in
+        if (page === 'register' || page === '') {
+          setPage('home');
         }
       } else {
-        // User is logged out
         const protectedPages = ['decks', 'analytics', 'settings', 'profile'];
         if (protectedPages.includes(page)) {
-          setPage('register'); // Redirect to register if on a protected page
+          setPage('register');
         }
-        // The condition `else if (page === 'profile')` was redundant as 'profile' is in protectedPages
       }
     });
-
-    return () => unsubscribe(); // Cleanup subscription on component unmount
-  }, [page]); // Add `page` to dependencies to re-evaluate redirects if page changes externally
+    return () => unsubscribe();
+  }, [page, queryClient]);
 
   const renderPage = () => {
     if (isLoadingAuth) {
       return <div>Loading application...</div>;
     }
 
+    const ensureLoggedIn = (targetPage: string, component: JSX.Element): JSX.Element => {
+      if (!isLoggedIn) {
+        if (page !== 'register') {
+            setPage('register');
+            return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+        }
+        return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+      }
+      return component;
+    };
+
     switch (page) {
       case 'home':
         return <Home />;
       case 'decks':
-        if (!isLoggedIn) {
-          // It's better to setPage and let the effect handle the redirect,
-          // or return the component directly if that's the desired UX.
-          // For simplicity here, if not logged in, we can directly render Register or let useEffect handle it.
-          // To avoid rendering anything briefly before redirect:
-          // setPage('register'); // This would trigger a re-render
-          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />; // Or let useEffect handle it by returning null
-        }
-        if (selectedDeckId !== null) {
-          return (
+        return ensureLoggedIn('decks',
+          selectedDeckId !== null ? (
             <DeckDetail
               deckId={selectedDeckId}
               onBack={() => setSelectedDeckId(null)}
             />
-          );
-        } else {
-          // DeckList can now use tRPC hooks like trpc.cards.getMyDecksAndCards.useQuery()
-          return <DeckList setSelectedDeckId={setSelectedDeckId} />;
-        }
+          ) : (
+            <DeckList setSelectedDeckId={setSelectedDeckId} />
+          )
+        );
       case 'analytics':
-        if (!isLoggedIn) {
-          // setPage('register');
-          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
-        }
-        return <AnalyticsDashboard />;
+        return ensureLoggedIn('analytics', <AnalyticsDashboard />);
       case 'settings':
-        if (!isLoggedIn) {
-          // setPage('register');
-          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
-        }
-        return <Settings />;
+        return ensureLoggedIn('settings', <Settings />);
       case 'register':
         if (isLoggedIn) {
-          // setPage('home');
-          return <Home />; // If already logged in, show home instead of register
+          setTimeout(() => setPage('home'), 0);
+          return <Home />;
         }
         return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
       case 'profile':
-        if (!isLoggedIn) {
-          // setPage('register');
-          return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
-        }
-        // Profile component can use tRPC hooks for user-specific data
-        return <Profile />;
+        return ensureLoggedIn('profile', <Profile />);
       default:
-        // Fallback: if page state is unknown, redirect based on login status
-        setPage(isLoggedIn ? 'home' : 'register');
-        // Return null or a loading indicator while the state updates and re-renders
-        return isLoggedIn ? <Home /> : <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} />;
+        setTimeout(() => setPage(isLoggedIn ? 'home' : 'register'), 0);
+        return isLoadingAuth ? <div>Loading application...</div> : null;
     }
   };
 
   const handleSetPage = (newPage: string) => {
     if (newPage === 'register' && isLoggedIn) {
-      setPage('profile'); // If logged in and trying to go to register, go to profile instead
+      setPage('profile');
     } else {
       setPage(newPage);
     }
-    setSelectedDeckId(null); // Reset selected deck when changing main pages
+    setSelectedDeckId(null);
   };
 
   return (
-    // Provide the tRPC client and QueryClient to the component tree
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <div class="app-container">
-          <Header
-            page={page}
-            setPage={handleSetPage}
-            isLoggedIn={isLoggedIn}
-          />
-          <div class="content-container">{renderPage()}</div>
+        <div id="app">
+          <Header page={page} setPage={handleSetPage} isLoggedIn={isLoggedIn} />
+          <main>
+            {renderPage()}
+          </main>
           <Footer />
         </div>
       </QueryClientProvider>
