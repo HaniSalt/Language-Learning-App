@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDkjgnMudgHHZc4HjltF9BzelehZ5aBkus",
@@ -11,8 +10,13 @@ const firebaseConfig = {
   appId: "1:334404445801:web:c540bd06f74c04124024f8",
   measurementId: "G-NJNZ4WLX22"
 };
+function updateUserDataMongo(user) {
+  const username= user.displayName;
+  const dateOfCreation = user.dateOfCreation;
+  const userId = user.uid;
+}
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const user = auth.currentUser;
 export { app, auth };

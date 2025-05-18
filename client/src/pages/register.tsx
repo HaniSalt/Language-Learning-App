@@ -2,6 +2,8 @@ import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
 import { docreateUserWithEmailAndPassword, doSignInWithEmailAndPassword } from '../firebase/auth';
 import './register.less';
+import { getAuth } from 'firebase/auth';
+import axios from 'axios'; 
 
 interface RegisterProps {
   setPage: (page: string) => void;
@@ -38,6 +40,26 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn }
       setIsSubmitting(false);
       return;
     }
+
+    await docreateUserWithEmailAndPassword(email, password);
+const user = getAuth().currentUser;
+
+if (user) {
+  const userData = {
+    userName: user.displayName || email, // use email if displayName is null
+    userId: user.uid,
+    dateOfCreation: new Date().toISOString()
+  };
+
+  try {
+    await axios.post('http://localhost:3001/post', userData);
+    console.log('User data posted to MongoDB');
+  } catch (err) {
+    console.error('Error posting user data:', err);
+  }
+    setIsLoggedIn(true);
+    setPage('home');
+  }
 
     // --- Firebase Interaction ---
     try {
