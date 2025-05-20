@@ -14,6 +14,7 @@ mongoose.connect(process.env.ATLAS_URI)
   .then(() => console.log('MongoDB connection established'))
   .catch(err => console.error('MongoDB connection error:', err));
 
+// User Schema
 const userSchema = new mongoose.Schema({
   userName: String, 
   userId: String,  
@@ -22,10 +23,29 @@ const userSchema = new mongoose.Schema({
 
 const Users = mongoose.model('User', userSchema);
 
+// Deck Schema
+const cardSchema = new mongoose.Schema({
+  id: Number,
+  front: String,
+  back: String,
+  imageUrl: { type: String, default: '' },
+  audioUrl: { type: String, default: '' }
+});
+
+const deckSchema = new mongoose.Schema({
+  id: Number,
+  name: String,
+  cards: [cardSchema],
+  userId: { type: String, required: true } // Associate deck with user
+});
+
+const Decks = mongoose.model('Deck', deckSchema);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/src/pages/register.tsx'));
 });
 
+// User registration endpoint
 app.post('/post', async (req, res) => {
   try {
     const { userName, userId, dateOfCreation } = req.body;
@@ -41,12 +61,138 @@ app.post('/post', async (req, res) => {
     });
 
     await newUser.save();
+    
+    // Create default decks for new users
+    const defaultDecks = [
+      {
+        id: Date.now(),
+        name: 'Spanish Basics',
+        cards: [
+          { id: Date.now() + 1, front: 'Hola', back: 'Hello' },
+          { id: Date.now() + 2, front: 'Adiós', back: 'Goodbye' },
+        ],
+        userId: userId
+      },
+      {
+        id: Date.now() + 100,
+        name: 'French Vocabulary',
+        cards: [
+          { id: Date.now() + 101, front: 'Bonjour', back: 'Hello' },
+          { id: Date.now() + 102, front: 'Au revoir', back: 'Goodbye' },
+        ],
+        userId: userId
+      }
+    ];
+    
+    await Decks.insertMany(defaultDecks);
+    
     console.log('User data saved to MongoDB:', newUser);
     res.status(201).json({ message: 'User registered and data saved successfully!', data: newUser });
 
   } catch (error) {
     console.error('Error saving user to MongoDB:', error);
     res.status(500).json({ message: 'Server error while saving user data', error: error.message });
+  }
+});
+
+// Get all decks for a specific user
+app.get('/api/decks/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const decks = await Decks.find({ userId });
+    res.status(200).json(decks);
+  } catch (error) {
+    console.error('Error fetching decks:', error);
+    res.status(500).json({ message: 'Server error while fetching decks', error: error.message });
+  }
+});
+
+// Create a new deck
+app.post('/api/decks', async (req, res) => {
+  try {
+    const { name, userId } = req.body;
+    
+    if (!name || !userId) {
+      return res.status(400).json({ message: 'Missing required fields: name, userId' });
+    }
+    
+    const newDeck = new Decks({
+      id: Date.now(),
+      name,
+      cards: [],
+      userId
+    });
+    
+    await newDeck.save();
+    res.status(201).json(newDeck);
+  } catch (error) {
+    console.error('Error creating deck:', error);
+    res.status(500).json({ message: 'Server error while creating deck', error: error.message });
+  }
+});
+
+// Update an existing deck
+app.put('/api/decks/:deckId', async (req, res) => {
+  try {
+    const { deckId } = req.params;
+    const updatedDeck = req.body;
+    
+    const result = await Decks.findOneAndUpdate(
+      { id: parseInt(deckId) },
+      updatedDeck,
+      { new: true }
+    );
+    
+    if (!result) {
+      return res.status(404).json({ message: 'Deck not found' });
+    }
+    
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error updating deck:', error);
+    res.status(500).json({ message: 'Server error while updating deck', error: error.message });
+  }
+});
+
+// Delete a deck
+app.delete('/api/decks/:deckId', async (req, res) => {
+  try {
+    const { deckId } = req.params;
+    
+    const result = await Decks.findOneAndDelete({ id: parseInt(deckId) });
+    
+    if (!result) {
+      return res.status(404).json({ message: 'Deck not found' });
+    }
+    
+    res.status(200).json({ message: 'Deck deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting deck:', error);
+    res.status(500).json({ message: 'Server error while deleting deck', error: error.message });
+  }
+});
+
+// Import decks
+app.post('/api/decks/import', async (req, res) => {
+  try {
+    const { decks, userId } = req.body;
+    
+    if (!decks || !Array.isArray(decks) || !userId) {
+      return res.status(400).json({ message: 'Invalid request: decks must be an array and userId is required' });
+    }
+    
+    // Add userId to each deck
+    const decksWithUserId = decks.map(deck => ({
+      ...deck,
+      userId
+    }));
+    
+    await Decks.insertMany(decksWithUserId);
+    
+    res.status(201).json({ message: 'Decks imported successfully' });
+  } catch (error) {
+    console.error('Error importing decks:', error);
+    res.status(500).json({ message: 'Server error while importing decks', error: error.message });
   }
 });
 

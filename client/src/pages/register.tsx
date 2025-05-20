@@ -1,17 +1,18 @@
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
 import { docreateUserWithEmailAndPassword, doSignInWithEmailAndPassword } from '../firebase/auth';
+import { User as FirebaseUser } from 'firebase/auth';
 import './register.less';
-import { getAuth } from 'firebase/auth';
-import axios from 'axios'; 
+import axios from 'axios';
+import { getDecksForUser, Deck } from '../utils/deckApi';
 
 interface RegisterProps {
   setPage: (page: string) => void;
-  // Add setIsLoggedIn prop
   setIsLoggedIn: (isLoggedIn: boolean) => void;
+  setUserDecks: (decks: Deck[]) => void; // Function to update decks in App.tsx
 }
 
-const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn }) => {
+const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, setUserDecks }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,12 +20,24 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn }
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleSuccessfulAuth = async (firebaseUser: FirebaseUser) => {
+    try {
+      // Fetch decks for the newly logged-in/registered user
+      const decks = await getDecksForUser(firebaseUser.uid);
+      setUserDecks(decks);
+      setIsLoggedIn(true);
+      setPage('home');
+    } catch (err) {
+      console.error('Error fetching decks after auth:', err);
+      setError('Could not load your decks. Please try again.');
+    }
+  };
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
 
-    // --- Validation ---
     if (!email || !password) {
       setError('Please fill in both email and password.');
       setIsSubmitting(false);
@@ -41,40 +54,38 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn }
       return;
     }
 
-    await docreateUserWithEmailAndPassword(email, password);
-const user = getAuth().currentUser;
-
-if (user) {
-  const userData = {
-    userName: user.displayName || email, // use email if displayName is null
-    userId: user.uid,
-    dateOfCreation: new Date().toISOString()
-  };
-
-  try {
-    await axios.post('http://localhost:3001/post', userData);
-    console.log('User data posted to MongoDB');
-  } catch (err) {
-    console.error('Error posting user data:', err);
-  }
-    setIsLoggedIn(true);
-    setPage('home');
-  }
-
-    // --- Firebase Interaction ---
     try {
       if (isLogin) {
-        await doSignInWithEmailAndPassword(email, password);
+        const userCredential = await doSignInWithEmailAndPassword(email, password);
         console.log('Login successful for:', email);
-        // Update login state and navigate
-        setIsLoggedIn(true);
-        setPage('home');
+        if (userCredential.user) {
+          await handleSuccessfulAuth(userCredential.user);
+        } else {
+           setError('Login failed: Could not retrieve user details.');
+        }
       } else {
-        await docreateUserWithEmailAndPassword(email, password);
+        const userCredential = await docreateUserWithEmailAndPassword(email, password);
         console.log('Registration successful for:', email);
-        // Update login state and navigate
-        setIsLoggedIn(true);
-        setPage('home');
+        const firebaseUser = userCredential.user;
+
+        if (firebaseUser) {
+          const userData = {
+            userName: firebaseUser.displayName || email,
+            userId: firebaseUser.uid,
+            dateOfCreation: new Date().toISOString()
+          };
+          try {
+            await axios.post('http://localhost:3001/post', userData);
+            console.log('User data posted to MongoDB, default decks created.');
+            await handleSuccessfulAuth(firebaseUser); // Fetch decks (including default ones)
+          } catch (err) {
+            console.error('Error posting user data or fetching initial decks:', err);
+            setError('Registration complete, but failed to setup account data. Please try logging in.');
+            // Potentially sign out the firebase user if backend setup fails critically
+          }
+        } else {
+            setError('Registration failed: Could not retrieve user details.');
+        }
       }
     } catch (err: any) {
       console.error("Authentication Error:", err);
@@ -98,6 +109,7 @@ if (user) {
         default:
           setError(`Authentication failed: ${err.message || 'An unknown error occurred.'}`);
       }
+    } finally {
       setIsSubmitting(false);
     }
   };

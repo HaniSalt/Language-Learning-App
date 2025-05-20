@@ -1,46 +1,34 @@
 import { FunctionalComponent } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
 import { doSignOut } from '../firebase/auth';
-import { auth } from '../firebase/firebase'; // Adjust this import to match your Firebase setup
-import './Profile.less'; // Create this file for styling
+import './Profile.less';
+import { User as FirebaseUser } from 'firebase/auth';
 
-interface ProfileProps {
-  // Add any props if needed
+export interface ProfileProps {
+  currentUser: FirebaseUser | null; // Accept currentUser as a prop
 }
 
-const Profile: FunctionalComponent<ProfileProps> = () => {
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Get current user data
-    const user = auth.currentUser;
-    if (user) {
-      setUserEmail(user.email);
-    }
-    setIsLoading(false);
-  }, []);
-
+const Profile: FunctionalComponent<ProfileProps> = ({ currentUser }) => {
   const handleSignOut = async () => {
     try {
       await doSignOut();
       console.log('Signed out successfully');
-      // No need to redirect - the auth state listener in App will handle this
     } catch (error) {
       console.error('Error signing out:', error);
+      alert(`Error signing out: ${error.message}`);
     }
   };
 
-  if (isLoading) {
-    return <div>Loading profile...</div>;
+  // App.tsx's ensureLoggedIn should prevent this component from rendering if currentUser is null
+  if (!currentUser) {
+    return <div>Loading profile or not logged in...</div>;
   }
 
   return (
     <div class="profile-container">
       <h2>User Profile</h2>
       <div class="profile-info">
-        <p><strong>Email:</strong> {userEmail}</p>
-        {/* Add more user information here as needed */}
+        <p><strong>Email:</strong> {currentUser.email}</p>
+        {currentUser.displayName && <p><strong>Display Name:</strong> {currentUser.displayName}</p>}
       </div>
       <div class="profile-actions">
         <button onClick={handleSignOut} class="sign-out-btn">

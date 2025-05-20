@@ -1,26 +1,27 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Server for language learning application",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch index.js",
     "start": "nodemon index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "RU0BNQ",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "@trpc/server": "^11.1.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0",
+    "express": "^4.18.2",
     "firebase-admin": "^13.4.0",
     "mongoose": "^8.15.0",
-    "nodemon": "^3.1.10",
-    "path": "^0.12.7",
-    "superjson": "^2.2.2",
     "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
+    "nodemon": "^3.1.10"
   }
 }
