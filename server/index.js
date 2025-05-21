@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // Mongoose is a singleton
 require('dotenv').config({ path: "./config.env" });
 const path = require('path');
 
@@ -10,20 +10,15 @@ app.use(cors());
 app.use(express.static(__dirname));
 app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect(process.env.ATLAS_URI)
-  .then(() => console.log('MongoDB connection established'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
 // User Schema
 const userSchema = new mongoose.Schema({
-  userName: String, 
-  userId: String,  
+  userName: String,
+  userId: String,
   dateOfCreation: String
 });
+mongoose.model('User', userSchema); // Define model on the mongoose instance
 
-const Users = mongoose.model('User', userSchema);
-
-// Deck Schema
+// Card and Deck Schemas
 const cardSchema = new mongoose.Schema({
   id: Number,
   front: String,
@@ -33,62 +28,39 @@ const cardSchema = new mongoose.Schema({
 });
 
 const deckSchema = new mongoose.Schema({
-  id: Number,
+  id: Number, // Your custom ID
   name: String,
   cards: [cardSchema],
-  userId: { type: String, required: true } // Associate deck with user
+  userId: { type: String, required: true }
 });
+mongoose.model('Deck', deckSchema); // Define model on the mongoose instance
 
-const Decks = mongoose.model('Deck', deckSchema);
-
+// ========== ROUTES ==========
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/src/pages/register.tsx'));
 });
 
 // User registration endpoint
 app.post('/post', async (req, res) => {
+  const Users = mongoose.model('User'); // Access model
+  const Decks = mongoose.model('Deck');
   try {
     const { userName, userId, dateOfCreation } = req.body;
 
     if (!userName || !userId || !dateOfCreation) {
       return res.status(400).json({ message: 'Missing required fields: userName, userId, dateOfCreation' });
     }
-
-    const newUser = new Users({
-      userName,
-      userId,
-      dateOfCreation
-    });
-
+    const newUser = new Users({ userName, userId, dateOfCreation });
     await newUser.save();
-    
-    // Create default decks for new users
+
     const defaultDecks = [
-      {
-        id: Date.now(),
-        name: 'Spanish Basics',
-        cards: [
-          { id: Date.now() + 1, front: 'Hola', back: 'Hello' },
-          { id: Date.now() + 2, front: 'Adiós', back: 'Goodbye' },
-        ],
-        userId: userId
-      },
-      {
-        id: Date.now() + 100,
-        name: 'French Vocabulary',
-        cards: [
-          { id: Date.now() + 101, front: 'Bonjour', back: 'Hello' },
-          { id: Date.now() + 102, front: 'Au revoir', back: 'Goodbye' },
-        ],
-        userId: userId
-      }
+      { id: Date.now(), name: 'Spanish Basics', cards: [{ id: Date.now() + 1, front: 'Hola', back: 'Hello' }], userId: userId },
+      { id: Date.now() + 100, name: 'French Vocabulary', cards: [{ id: Date.now() + 101, front: 'Bonjour', back: 'Hello' }], userId: userId }
     ];
-    
     await Decks.insertMany(defaultDecks);
-    
+
     console.log('User data saved to MongoDB:', newUser);
     res.status(201).json({ message: 'User registered and data saved successfully!', data: newUser });
-
   } catch (error) {
     console.error('Error saving user to MongoDB:', error);
     res.status(500).json({ message: 'Server error while saving user data', error: error.message });
@@ -97,6 +69,7 @@ app.post('/post', async (req, res) => {
 
 // Get all decks for a specific user
 app.get('/api/decks/:userId', async (req, res) => {
+  const Decks = mongoose.model('Deck');
   try {
     const { userId } = req.params;
     const decks = await Decks.find({ userId });
@@ -109,22 +82,20 @@ app.get('/api/decks/:userId', async (req, res) => {
 
 // Create a new deck
 app.post('/api/decks', async (req, res) => {
+  const Decks = mongoose.model('Deck');
   try {
     const { name, userId } = req.body;
-    
     if (!name || !userId) {
       return res.status(400).json({ message: 'Missing required fields: name, userId' });
     }
-    
     const newDeck = new Decks({
-      id: Date.now(),
+      id: Date.now(), // Setting your custom ID
       name,
       cards: [],
       userId
     });
-    
     await newDeck.save();
-    res.status(201).json(newDeck);
+    res.status(201).json(newDeck); // newDeck will have both _id and your custom id
   } catch (error) {
     console.error('Error creating deck:', error);
     res.status(500).json({ message: 'Server error while creating deck', error: error.message });
@@ -133,20 +104,12 @@ app.post('/api/decks', async (req, res) => {
 
 // Update an existing deck
 app.put('/api/decks/:deckId', async (req, res) => {
+  const Decks = mongoose.model('Deck');
   try {
     const { deckId } = req.params;
     const updatedDeck = req.body;
-    
-    const result = await Decks.findOneAndUpdate(
-      { id: parseInt(deckId) },
-      updatedDeck,
-      { new: true }
-    );
-    
-    if (!result) {
-      return res.status(404).json({ message: 'Deck not found' });
-    }
-    
+    const result = await Decks.findOneAndUpdate({ id: parseInt(deckId) }, updatedDeck, { new: true });
+    if (!result) return res.status(404).json({ message: 'Deck not found' });
     res.status(200).json(result);
   } catch (error) {
     console.error('Error updating deck:', error);
@@ -156,15 +119,11 @@ app.put('/api/decks/:deckId', async (req, res) => {
 
 // Delete a deck
 app.delete('/api/decks/:deckId', async (req, res) => {
+  const Decks = mongoose.model('Deck');
   try {
     const { deckId } = req.params;
-    
     const result = await Decks.findOneAndDelete({ id: parseInt(deckId) });
-    
-    if (!result) {
-      return res.status(404).json({ message: 'Deck not found' });
-    }
-    
+    if (!result) return res.status(404).json({ message: 'Deck not found' });
     res.status(200).json({ message: 'Deck deleted successfully' });
   } catch (error) {
     console.error('Error deleting deck:', error);
@@ -174,21 +133,14 @@ app.delete('/api/decks/:deckId', async (req, res) => {
 
 // Import decks
 app.post('/api/decks/import', async (req, res) => {
+  const Decks = mongoose.model('Deck');
   try {
     const { decks, userId } = req.body;
-    
     if (!decks || !Array.isArray(decks) || !userId) {
       return res.status(400).json({ message: 'Invalid request: decks must be an array and userId is required' });
     }
-    
-    // Add userId to each deck
-    const decksWithUserId = decks.map(deck => ({
-      ...deck,
-      userId
-    }));
-    
+    const decksWithUserId = decks.map(deck => ({ ...deck, userId }));
     await Decks.insertMany(decksWithUserId);
-    
     res.status(201).json({ message: 'Decks imported successfully' });
   } catch (error) {
     console.error('Error importing decks:', error);
@@ -196,6 +148,25 @@ app.post('/api/decks/import', async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
-  console.log('Server is running on port 3001');
-});
+// Export the app for testing purposes (and for other modules if needed)
+module.exports = app;
+
+// Start server and connect to DB only if this file is run directly
+if (require.main === module) {
+  const PORT = process.env.PORT || 3001;
+  if (!process.env.ATLAS_URI) {
+    console.error("FATAL ERROR: ATLAS_URI is not defined in the environment variables.");
+    process.exit(1);
+  }
+  mongoose.connect(process.env.ATLAS_URI)
+    .then(() => {
+      console.log('MongoDB connection established (initiated by index.js direct run)');
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT} (initiated by index.js direct run)`);
+      });
+    })
+    .catch(err => {
+      console.error('MongoDB connection error (initiated by index.js direct run):', err);
+      process.exit(1);
+    });
+}
