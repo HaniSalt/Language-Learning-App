@@ -1,73 +1,93 @@
-import axios from 'axios';
-import { User as FirebaseUser } from 'firebase/auth';
+import { trpc } from '../trpc';
+import type { Deck, Card } from '../types';
 
-export interface Card {
-  id: number;
-  front: string;
-  back: string;
-  imageUrl?: string;
-  audioUrl?: string;
-}
+export const getDecksForUser = async (userId: string): Promise<Deck[]> => {
+  try {
+    const decks = await trpc.deck.getDecksByUserId.query({ userId });
+    return decks as Deck[]; 
+  } catch (error) {
+    console.error("tRPC - Failed to fetch user decks:", error);
+    throw error;
+  }
+};
 
-export interface Deck {
-  id: number;
-  _id?: string;
-  name: string;
-  cards: Card[];
+export const createNewDeck = async (name: string, userId: string, cards?: Card[]): Promise<Deck> => {
+  try {
+    const newDeck = await trpc.deck.createDeck.mutate({ name, userId, cards });
+    return newDeck as Deck;
+  } catch (error) {
+    console.error("tRPC - Failed to create deck:", error);
+    throw error;
+  }
+};
+
+export const updateDeckApi = async (
+  deckId: number,
+  userId: string,
+  updates: Partial<Omit<Deck, 'id' | 'userId' | 'cards'>> & { cards?: Card[] }
+): Promise<Deck> => {
+  try {
+    const updatedDeck = await trpc.deck.updateDeck.mutate({ deckId, userId, ...updates });
+    return updatedDeck as Deck;
+  } catch (error) {
+    console.error("tRPC - Failed to update deck:", error);
+    throw error;
+  }
+};
+
+export const deleteDeckApi = async (deckId: number, userId: string): Promise<{ message: string }> => {
+  try {
+    return await trpc.deck.deleteDeck.mutate({ deckId, userId });
+  } catch (error) {
+    console.error("tRPC - Failed to delete deck:", error);
+    throw error;
+  }
+};
+
+export const importDecksApi = async (
+  decksToImport: Array<Omit<Deck, 'userId'>>,
+  userId: string
+): Promise<{ message: string }> => {
+  try {
+    const formattedDecks = decksToImport.map(d => ({
+      id: d.id,
+      name: d.name,
+      cards: d.cards.map(c => ({
+        id: c.id,
+        front: c.front,
+        back: c.back,
+        imageUrl: c.imageUrl,
+        audioUrl: c.audioUrl,
+      })),
+    }));
+    return await trpc.deck.importDecks.mutate({ decks: formattedDecks, userId });
+  } catch (error) {
+    console.error("tRPC - Failed to import decks:", error);
+    throw error;
+  }
+};
+
+export const exportDecksApi = async (userId: string): Promise<Deck[]> => {
+  try {
+    const decks = await trpc.deck.getDecksByUserId.query({ userId });
+    return decks as Deck[];
+  } catch (error) {
+    console.error("tRPC - Failed to fetch decks for export:", error);
+    throw error;
+  }
+};
+
+export const registerUserWithBackend = async (userData: {
+  userName: string;
   userId: string;
-}
-
-const API_BASE_URL = 'http://localhost:3001/api';
-
-// Fetch all decks for a user
-export async function getDecksForUser(userId: string): Promise<Deck[]> {
-  const response = await axios.get(`${API_BASE_URL}/decks/${userId}`);
-  return response.data;
-}
-
-// Add a new deck
-export async function addDeckApi(deckName: string, userId: string): Promise<Deck> {
-  const response = await axios.post(`${API_BASE_URL}/decks`, { name: deckName, userId });
-  return response.data;
-}
-
-// Update an existing deck
-export async function updateDeckApi(deckId: number, updatedDeckData: Partial<Deck>): Promise<Deck> {
-  const response = await axios.put(`${API_BASE_URL}/decks/${deckId}`, updatedDeckData);
-  return response.data;
-}
-
-// Delete a deck
-export async function deleteDeckApi(deckId: number): Promise<void> {
-  await axios.delete(`${API_BASE_URL}/decks/${deckId}`);
-}
-
-export async function addCardToDeckViaApi(deckId: number, cardData: Omit<Card, 'id'>, userId: string): Promise<Deck> {
-  const response = await axios.get(`${API_BASE_URL}/decks/${userId}`);
-  const decks: Deck[] = response.data;
-  const deck = decks.find(d => d.id === deckId);
-  if (!deck) throw new Error('Deck not found');
-  const newCard: Card = { ...cardData, id: Date.now() }; // Ensure unique ID generation
-  deck.cards.push(newCard);
-  return updateDeckApi(deckId, deck); // Ensure updateDeckApi sends the whole deck or backend handles merging
-}
-
-export async function deleteCardFromDeckViaApi(deckId: number, cardId: number, userId: string): Promise<Deck> {
-  const response = await axios.get(`${API_BASE_URL}/decks/${userId}`);
-  const decks: Deck[] = response.data;
-  const deck = decks.find(d => d.id === deckId);
-  if (!deck) throw new Error('Deck not found');
-  deck.cards = deck.cards.filter(card => card.id !== cardId);
-  return updateDeckApi(deckId, deck);
-}
-
-// Import decks for a user
-export async function importDecksApi(decksToImport: Deck[], userId: string): Promise<{ message: string }> {
-  const response = await axios.post(`${API_BASE_URL}/decks/import`, { decks: decksToImport, userId });
-  return response.data;
-}
-
-// Export decks (simply fetches and lets the component handle file creation)
-export async function exportDecksApi(userId: string): Promise<Deck[]> {
-  return getDecksForUser(userId);
-}
+  dateOfCreation: string;
+}) => {
+  try {
+    const result = await trpc.user.registerUser.mutate(userData);
+    console.log('User registered on backend:', result.message);
+    return result.user;
+  } catch (error) {
+    console.error("tRPC - Failed to register user on backend:", error);
+    throw error;
+  }
+};

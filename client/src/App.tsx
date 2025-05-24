@@ -1,18 +1,19 @@
-import { FunctionalComponent } from 'preact';
+import { FunctionalComponent, JSX } from 'preact';
 import { useState, useEffect, useCallback } from 'preact/hooks';
 import { Header } from './components/UI/Header';
 import { Footer } from './components/UI/Footer';
 import { Home } from './pages/Home';
 import { DeckList } from './components/Deck/DeckList';
 import { DeckDetail } from './components/Deck/DeckDetail';
-import { AnalyticsDashboard, AnalyticsDashboardProps } from './components/Settings/AnalyticsDashboard'; 
+import { AnalyticsDashboard } from './components/Settings/AnalyticsDashboard';
 import { Settings } from './components/Settings/Settings';
 import Register from './pages/register';
-import Profile, { ProfileProps } from './pages/profile';
+import Profile from './pages/profile';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth } from './firebase/firebase';
 import './styles/globalStyles.less';
-import { getDecksForUser, Deck } from './utils/deckApi';
+import { getDecksForUser } from './utils/deckApi';
+import type { Deck } from './types';
 import { ImportExport } from './components/Deck/ImportExport';
 
 const App: FunctionalComponent = () => {
@@ -29,7 +30,7 @@ const App: FunctionalComponent = () => {
         const decks = await getDecksForUser(user.uid);
         setUserDecks(decks);
       } catch (error) {
-        console.error("Failed to fetch user decks:", error);
+        console.error("Failed to fetch user decks (App.tsx):", error);
         setUserDecks([]);
       }
     } else {
@@ -41,14 +42,18 @@ const App: FunctionalComponent = () => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       setIsLoggedIn(!!user);
-      await fetchUserDecks(user);
+      fetchUserDecks(user);
       setIsLoadingAuth(false);
 
       if (user) {
-        if (page === 'register' || page === '') setPage('home');
+        if (page === 'register' || page === '') {
+          setPage('home');
+        }
       } else {
         const protectedPages = ['decks', 'analytics', 'settings', 'profile', 'importexportpage'];
-        if (protectedPages.includes(page)) setPage('register');
+        if (protectedPages.includes(page)) {
+          setPage('register');
+        }
       }
     });
     return () => unsubscribe();
@@ -62,13 +67,16 @@ const App: FunctionalComponent = () => {
     }
     setSelectedDeckId(null);
   };
-  
+
   const renderPage = () => {
-    if (isLoadingAuth) return <div>Loading application...</div>;
+    if (isLoadingAuth) {
+      return <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2em' }}>Loading application...</div>;
+    }
 
     const ensureLoggedIn = (component: JSX.Element, _targetPage?: string): JSX.Element => {
       if (!isLoggedIn) {
-        if (page !== 'register') setTimeout(() => setPage('register'), 0);
+        if (page !== 'register') {
+        }
         return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} setUserDecks={setUserDecks} />;
       }
       return component;
@@ -98,7 +106,10 @@ const App: FunctionalComponent = () => {
         );
       case 'importexportpage':
         return ensureLoggedIn(
-          <ImportExport onDecksChanged={() => fetchUserDecks(currentUser)} />,
+          <ImportExport
+            userId={currentUser?.uid || ''}
+            onDecksChanged={() => fetchUserDecks(currentUser)}
+          />,
           'importexportpage'
         );
       case 'analytics':
@@ -107,18 +118,22 @@ const App: FunctionalComponent = () => {
           'analytics'
         );
       case 'settings':
-        return ensureLoggedIn(<Settings />, 'settings');
+        return ensureLoggedIn(
+          <Settings />,
+          'settings'
+        );
       case 'register':
         if (isLoggedIn) {
-          setTimeout(() => setPage('home'), 0);
           return <Home />;
         }
         return <Register setPage={setPage} setIsLoggedIn={setIsLoggedIn} setUserDecks={setUserDecks} />;
       case 'profile':
-        return ensureLoggedIn(<Profile currentUser={currentUser} />, 'profile');
+        return ensureLoggedIn(
+          <Profile currentUser={currentUser} />,
+          'profile'
+        );
       default:
-        setTimeout(() => setPage(isLoggedIn ? 'home' : 'register'), 0);
-        return <div>Redirecting...</div>;
+        return <div style={{ textAlign: 'center', padding: '50px' }}>Redirecting...</div>;
     }
   };
 

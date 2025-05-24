@@ -1,7 +1,6 @@
 import { FunctionalComponent} from 'preact';
 import { useState } from 'preact/hooks';
 import './headerStyles.less';
-import logo from '../../assets/logo.png';
 
 interface HeaderProps {
   page: string;
@@ -19,9 +18,6 @@ export const Header: FunctionalComponent<HeaderProps> = ({ page, setPage, isLogg
 
   return (
     <header class="header">
-      <div class="logo">
-        <img src={logo} alt="App Logo" />
-      </div>
       <nav class={`nav ${menuOpen ? 'open' : ''}`}>
         <ul>
           <li>

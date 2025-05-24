@@ -1,46 +1,27 @@
 {
+  "name": "client",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "test": "jest",
+    "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.5",
-    "@fortawesome/fontawesome-free": "^6.7.0",
-    "@mui/icons-material": "^6.1.9",
-    "@mui/material": "^6.1.9",
-    "@tanstack/react-query": "^5.76.1",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
     "@trpc/client": "^11.1.2",
-    "@trpc/react-query": "^11.1.2",
-    "axios": "^1.9.0",
-    "firebase": "^11.7.3",
-    "jest-environment-jsdom": "^29.7.0",
-    "preact": "^10.22.1",
-    "preact-router": "^4.1.2",
-    "zod": "^3.24.4"
+    "@trpc/server": "^11.1.2",
+    "firebase": "^11.8.1",
+    "preact": "^10.26.5"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.9.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/preact": "^3.2.4",
-    "@types/jest": "^29.5.14",
-    "babel-jest": "^29.7.0",
-    "jest": "^29.7.0",
+    "@preact/preset-vite": "^2.10.1",
     "less": "^4.3.0",
-    "less-loader": "^12.2.0",
-    "ts-jest": "^29.3.4",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3",
-    "vite": "^5.3.3"
-  },
-  "name": "language-learning-app",
-  "version": "1.0.0",
-  "description": "A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.",
-  "main": "index.js",
-  "author": "RU0BNQ",
-  "license": "ISC"
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  }
 }

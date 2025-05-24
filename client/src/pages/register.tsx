@@ -3,13 +3,14 @@ import { useState } from 'preact/hooks';
 import { docreateUserWithEmailAndPassword, doSignInWithEmailAndPassword } from '../firebase/auth';
 import { User as FirebaseUser } from 'firebase/auth';
 import './register.less';
-import axios from 'axios';
-import { getDecksForUser, Deck } from '../utils/deckApi';
+// Remove axios if no longer needed elsewhere: import axios from 'axios';
+import { getDecksForUser, registerUserWithBackend } from '../utils/deckApi'; // Import registerUserWithBackend
+import type { Deck } from '../types'; // Import Deck type
 
 interface RegisterProps {
   setPage: (page: string) => void;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
-  setUserDecks: (decks: Deck[]) => void; // Function to update decks in App.tsx
+  setUserDecks: (decks: Deck[]) => void;
 }
 
 const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, setUserDecks }) => {
@@ -22,7 +23,6 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, 
 
   const handleSuccessfulAuth = async (firebaseUser: FirebaseUser) => {
     try {
-      // Fetch decks for the newly logged-in/registered user
       const decks = await getDecksForUser(firebaseUser.uid);
       setUserDecks(decks);
       setIsLoggedIn(true);
@@ -30,6 +30,9 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, 
     } catch (err) {
       console.error('Error fetching decks after auth:', err);
       setError('Could not load your decks. Please try again.');
+      // Potentially sign out if critical data load fails
+      // await auth.signOut();
+      // setIsLoggedIn(false);
     }
   };
 
@@ -57,39 +60,44 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, 
     try {
       if (isLogin) {
         const userCredential = await doSignInWithEmailAndPassword(email, password);
-        console.log('Login successful for:', email);
         if (userCredential.user) {
           await handleSuccessfulAuth(userCredential.user);
         } else {
-           setError('Login failed: Could not retrieve user details.');
+          setError('Login failed: Could not retrieve user details.');
         }
-      } else {
+      } else { // Registration
         const userCredential = await docreateUserWithEmailAndPassword(email, password);
-        console.log('Registration successful for:', email);
         const firebaseUser = userCredential.user;
 
         if (firebaseUser) {
-          const userData = {
-            userName: firebaseUser.displayName || email,
+          const userDataForBackend = {
+            userName: firebaseUser.displayName || email.split('@')[0], // Get a sensible default username
             userId: firebaseUser.uid,
-            dateOfCreation: new Date().toISOString()
+            dateOfCreation: firebaseUser.metadata.creationTime || new Date().toISOString(),
           };
           try {
-            await axios.post('http://localhost:3001/post', userData);
-            console.log('User data posted to MongoDB, default decks created.');
+            // **Use tRPC mutation here**
+            await registerUserWithBackend(userDataForBackend);
+            console.log('User data posted to backend via tRPC, default decks created.');
             await handleSuccessfulAuth(firebaseUser); // Fetch decks (including default ones)
-          } catch (err) {
-            console.error('Error posting user data or fetching initial decks:', err);
-            setError('Registration complete, but failed to setup account data. Please try logging in.');
-            // Potentially sign out the firebase user if backend setup fails critically
+          } catch (backendError: any) {
+            console.error('Error during backend user registration or fetching initial decks:', backendError);
+            // Decide on UX:
+            // 1. Inform user backend setup failed, ask to retry login (which might trigger it again if designed so)
+            // 2. Or, sign out from Firebase if backend part is critical
+            setError(`Registration complete, but failed to setup account data: ${backendError.message || 'Please try logging in.'}`);
+            // Optionally, sign out from Firebase if backend registration is critical
+            // await auth.signOut(); // You'd need to import 'auth' from firebase config
+            // setIsLoggedIn(false); // Reflect this state change
           }
         } else {
-            setError('Registration failed: Could not retrieve user details.');
+          setError('Registration failed: Could not retrieve user details from Firebase.');
         }
       }
-    } catch (err: any) {
-      console.error("Authentication Error:", err);
-      switch (err.code) {
+    } catch (authError: any) {
+      console.error("Authentication Error:", authError);
+      // ... (your existing error handling for authError.code)
+      switch (authError.code) {
         case 'auth/user-not-found':
         case 'auth/invalid-credential':
           setError('Login failed: Invalid email or password.');
@@ -107,7 +115,7 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, 
           setError('Please enter a valid email address.');
           break;
         default:
-          setError(`Authentication failed: ${err.message || 'An unknown error occurred.'}`);
+          setError(`Authentication failed: ${authError.message || 'An unknown error occurred.'}`);
       }
     } finally {
       setIsSubmitting(false);
@@ -124,6 +132,7 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, 
   };
 
   return (
+    // Your JSX remains the same
     <div class="auth-container">
       <div class="auth-form-container">
         <h2>{isLogin ? 'Login' : 'Register'}</h2>

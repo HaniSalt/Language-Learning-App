@@ -2,16 +2,17 @@ import { FunctionalComponent } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { CardViewer } from '../Card/CardViewer';
 import { CardEditor } from '../Card/CardEditor';
-import { Deck, updateDeckApi, deleteDeckApi } from '../../utils/deckApi';
+import { updateDeckApi, deleteDeckApi } from '../../utils/deckApi';
+import type { Deck} from '../../types';
 import './deckDetailStyles.less';
 import MuiButton from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
 interface DeckDetailProps {
-  initialDeck: Deck; // The specific deck object passed from App.tsx
-  userId: string; // Current user's ID
+  initialDeck: Deck;
+  userId: string;
   onBack: () => void;
-  onDecksChanged: () => void; // Callback to App.tsx to refresh all decks
+  onDecksChanged: () => void;
 }
 
 export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
@@ -27,7 +28,7 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
   const [newDeckName, setNewDeckName] = useState('');
 
   useEffect(() => {
-    setDeck(initialDeck); // Update local deck state if initialDeck prop changes
+    setDeck(initialDeck);
     setNewDeckName(initialDeck.name);
   }, [initialDeck]);
 
@@ -37,10 +38,10 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
     const confirmDelete = confirm('Are you sure you want to delete this deck?');
     if (confirmDelete) {
       try {
-        await deleteDeckApi(deck.id);
+        await deleteDeckApi(deck.id, userId);
         onDecksChanged();
         onBack();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete deck:', error);
         alert(`Error deleting deck: ${error.message || 'Please try again.'}`);
       }
@@ -66,14 +67,14 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
 
   const handleSaveDeckName = async (e: Event) => {
     e.preventDefault();
-    if (deck && newDeckName.trim() !== deck.name) {
+    if (newDeckName.trim() && newDeckName.trim() !== deck.name) {
       try {
-        const updatedDeckPayload: Partial<Deck> = { name: newDeckName.trim() };
-        const updatedDeckFromApi = await updateDeckApi(deck.id, updatedDeckPayload);
-        setDeck(updatedDeckFromApi); // Update local state with API response
-        onDecksChanged(); // Notify App.tsx
+        const updatedDeckPayload: Partial<Omit<Deck, 'id' | 'userId' | 'cards'>> = { name: newDeckName.trim() };
+        const updatedDeckFromApi = await updateDeckApi(deck.id, userId, updatedDeckPayload);
+        setDeck(updatedDeckFromApi);
+        onDecksChanged();
         setIsEditingDeckName(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to update deck name:', error);
         alert(`Error updating deck name: ${error.message || 'Please try again.'}`);
       }
@@ -84,8 +85,9 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
 
   const handleDeckUpdatedByCardViewer = (updatedDeckFromChild: Deck) => {
     setDeck(updatedDeckFromChild);
-    onDecksChanged(); // Notify App.tsx
+    onDecksChanged();
   };
+
   return (
     <div class="deck-detail">
       <div class="deck-top-bar">
