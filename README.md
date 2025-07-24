@@ -1,75 +1,232 @@
-# Flashcards App
-A Preact-based flashcard application designed for language learning, featuring deck management, card editing, and support for images/audio. The application leverages Material-UI (MUI) for a consistent look and feel, and incorporates a dark theme option. Data is persisted in localStorage for offline use and can be imported/exported via JSON files.
+# Language Learning App - tRPC Implementation
 
-## Table of Contents
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Technologies & APIs Used](#tech&Api)
+A modern, full-stack flashcard application designed for language learning, featuring a Preact frontend with Material-UI components and a tRPC backend for end-to-end type-safe API communication.
 
-## Features
-### Deck Management
-<u>Create, edit, and delete decks:</u>
-Add new cards with front/back text, images, and audio.
-Persist data in localStorage.
-Card Viewer
+## ✨ Features
 
-<u>Flip cards to reveal the back:</u>
-Attached images and audio playback within each card.
-Edit individual cards at any time.
-Import/Export Decks
+### 🎯 Core Functionality
+- **Deck Management**: Create, edit, and delete flashcard decks
+- **Interactive Cards**: Add front/back text, images, and audio to cards
+- **Card Viewer**: Flip cards to reveal answers with smooth animations
+- **Import/Export**: Backup and share decks via JSON files
+- **User Authentication**: Secure login and registration with Firebase
+- **Cross-Device Sync**: Access your decks from any device
 
-<u>Import existing decks from a JSON file:</u>
-Export all decks to a JSON file for backup or sharing.
+### 🎨 User Experience
+- **Dark Theme**: Toggle between light and dark modes
+- **Material-UI Integration**: Consistent, responsive design
+- **Persistent Storage**: Data synced across devices via MongoDB
+- **Analytics Dashboard**: Overview of decks, cards, and learning progress
+- **Media Support**: Upload images and audio files to enhance learning
 
-<u>Dark Theme:</u>
-Switch between light and dark themes using custom CSS variables and MUI theming.
+### 🔧 Technical Features
+- **Type-Safe APIs**: End-to-end type safety with tRPC
+- **Modern Frontend**: Built with Preact and TypeScript
+- **Robust Backend**: Node.js with Express and MongoDB
+- **Authentication**: Firebase Authentication integration
+- **Responsive Design**: Works seamlessly on desktop and mobile
 
-<u>Material-UI Integration</u>
-Consistent UI components, including buttons, text fields, and icons.
-Responsive design using MUI’s grid system.
+## 🚀 Tech Stack
 
-<u>Analytics</u>
-Provide an overview of total decks, total cards, and more.
+### Frontend
+- **Preact** - Lightweight React alternative for optimal performance
+- **TypeScript** - Type safety and enhanced developer experience
+- **Material-UI (MUI)** - Consistent UI components and theming
+- **CSS/LESS** - Custom styling with CSS variables
+- **Axios** - HTTP client for API communication
 
-## Installation
-### Clone the Repository: 
-"git clone https://github.com/HaniSalt/Language-Learning-App.git"
-### Install Dependencies:
-cd C:\location-where-installed
-npm install
+### Backend
+- **tRPC** - End-to-end typesafe APIs
+- **Node.js** - Runtime environment
+- **Express.js** - Web application framework
+- **TypeScript** - Full-stack type safety
+- **Mongoose** - MongoDB object modeling
 
-### Start the Development Server:
+### Database & Authentication
+- **MongoDB Atlas** - Cloud-hosted NoSQL database
+- **Firebase Authentication** - Secure user authentication
+- **Mongoose ODM** - Schema validation and database operations
+
+### Development & Testing
+- **Jest** - Testing framework
+- **Supertest** - HTTP testing library
+
+## 🏗️ Backend Architecture
+
+### tRPC Server Structure
+The backend implements a modern tRPC server with the following architecture:
+
+- **Routers**: Domain-organized routers (deck, card, user, auth)
+- **Procedures**: Type-safe API endpoints with Zod validation
+- **Middleware**: Authentication, error handling, and logging
+- **Context**: Request context with user information and database connections
+- **Type Safety**: Shared types between client and server
+
+### API Architecture
+- **RESTful Design**: Intuitive endpoint structure
+- **Error Handling**: Consistent error responses and logging
+- **Input Validation**: Zod schemas for runtime type checking
+- **Authentication Middleware**: Firebase token verification
+- **CORS Configuration**: Secure cross-origin resource sharing
+
+## 📦 Installation
+
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn package manager
+- MongoDB Atlas account
+- Firebase project setup
+
+### Environment Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/HaniSalt/Language-Learning-App.git
+   cd Language-Learning-App
+   git checkout trpc-backend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   # Install root dependencies
+   npm install
+   
+   # Install server dependencies
+   cd server
+   npm install
+   
+   # Install client dependencies
+   cd ../client
+   npm install
+   ```
+
+3. **Environment Configuration**
+   
+   Create `server/config.env`:
+   ```env
+   ATLAS_URI=mongodb+srv://username:password@cluster.mongodb.net/database
+   PORT=5000
+   NODE_ENV=development
+   FIREBASE_PROJECT_ID=your-firebase-project-id
+   ```
+
+   Create `client/.env`:
+
+### Development Server
+
+```bash
+# Start backend server (from server directory)
+cd server
 npm run dev
 
-## Usage
-Creating a New Deck: Navigate to Your Decks and click Add New Deck.
-Enter a name for your deck and confirm.
+# Start frontend development server (from client directory)
+cd client
+npm run dev
+```
 
-Adding Cards: 
-Open a deck and click Add New Card.
-Fill in the front/back text, upload an optional image or audio file, then save.
+Access the application at `http://localhost:3000`
 
-Editing a Deck: 
-Click Edit Deck Name to rename a deck. 
-Or edit individual cards from the card viewer.
+## 📡 API Documentation (tRPC)
 
-Import/Export:
-Use Import to load decks from a JSON file.
-Use Export to download all decks as a JSON file for backup or sharing.
+### Authentication Procedures
+- `auth.register` - Create user profile after Firebase authentication
+- `auth.getUserProfile` - Fetch authenticated user information
+- `auth.verifyToken` - Validate Firebase authentication token
 
-Theme Toggle:
-Switch between light/dark mode in the settings.
+### Deck Management
+- `deck.getAll` - Fetch all decks for authenticated user
+- `deck.create` - Create new deck with name and user association
+- `deck.update` - Update deck name and metadata
+- `deck.delete` - Remove deck and all associated cards
+- `deck.import` - Bulk import multiple decks from JSON data
 
-## Technologies & APIs Used
-Preact: Core library for building performant, lightweight UI components.
+### Card Operations
+- `card.create` - Add new card to specific deck
+- `card.update` - Modify card content (front, back, media URLs)
+- `card.delete` - Remove card from deck
+- `card.reorder` - Change card position within deck
 
-TypeScript: Because it provides type safety and improved developer experience.
+### Data Procedures
+- `data.export` - Export all user decks to JSON format
+- `data.backup` - Create backup of user data
+- `data.restore` - Restore data from backup file
 
-Material-UI (MUI): Offers a consistent and responsive UI, including icon sets.
+## 🎯 Usage Guide
 
-LocalStorage: Persists decks and cards offline.
+### Getting Started
 
-FileReader & Blob APIs: Enables importing/exporting JSON files and reading media files for cards.
+1. **User Registration**
+   - Navigate to the registration page
+   - Create account with email and password
+   - Verify email if required
+   - Automatic default decks are created
 
-CSS/LESS: Custom styling with variables for theming, plus MUI theming for UI consistency.
+2. **Creating Your First Deck**
+   - Navigate to "Your Decks" from the main menu
+   - Click "Add New Deck"
+   - Enter a descriptive name for your deck
+   - Confirm creation
+
+3. **Adding Flashcards**
+   - Open your newly created deck
+   - Click "Add New Card"
+   - Fill in the front text (question/prompt)
+   - Fill in the back text (answer/translation)
+   - Optionally upload an image or audio file
+   - Save your card
+
+### Advanced Features
+
+4. **Studying Mode**
+   - Open any deck to start studying
+   - Click cards to flip and reveal answers
+   - Use keyboard shortcuts for navigation
+   - Track your progress in real-time
+
+5. **Data Management**
+   - **Import Decks**: Load existing decks from JSON files
+   - **Export Decks**: Download all decks for backup or sharing
+   - **Edit Cards**: Modify existing cards at any time
+   - **Bulk Operations**: Select multiple cards for batch actions
+
+6. **Customization**
+   - **Theme Toggle**: Switch between light and dark modes
+   - **Deck Organization**: Create categories and tags
+   - **Media Integration**: Add images and audio for better retention
+
+## 🧪 Testing
+
+### Backend Testing
+The server includes comprehensive test suites using Jest and Supertest:
+
+- **Unit Tests**: Individual function and method testing
+- **Integration Tests**: API endpoint testing with mock database
+- **Authentication Tests**: Firebase token validation testing
+- **Database Tests**: Mongoose model and schema validation
+
+### Frontend Testing
+Client-side testing focuses on component behavior and API integration:
+
+- **Component Tests**: UI component rendering and interaction
+- **API Integration Tests**: tRPC procedure calling and data flow
+- **User Flow Tests**: Complete user journey testing
+- **Mock Implementation**: Isolated component testing with mocked APIs
+
+## 🔒 Security Features
+
+- **Firebase Authentication**: Industry-standard user authentication
+- **Token Validation**: Server-side Firebase token verification
+- **User Authorization**: User-specific data access controls
+- **Input Validation**: Zod schema validation on all inputs
+- **CORS Protection**: Configured cross-origin resource sharing
+- **Environment Variables**: Secure configuration management
+
+## 🔮 Future Enhancements
+
+### Planned Features
+- [ ] **Spaced Repetition Algorithm**: Implement SRS for optimized learning
+- [ ] **Community Marketplace**: Share and discover decks from other users
+- [ ] **Advanced Analytics**: Detailed learning progress and statistics
+- [ ] **Offline Support**: Progressive Web App with offline capabilities
+
+**Happy Learning!** 🎓✨
