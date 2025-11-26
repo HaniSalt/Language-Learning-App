@@ -17,7 +17,7 @@ export interface Deck {
   userId: string;
 }
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:8080/api'; //gateway fogja hasznalni
 
 // Fetch all decks for a user
 export async function getDecksForUser(userId: string): Promise<Deck[]> {

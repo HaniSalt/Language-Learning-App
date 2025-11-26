@@ -28,7 +28,7 @@ const cardSchema = new mongoose.Schema({
 });
 
 const deckSchema = new mongoose.Schema({
-  id: Number, // Your custom ID
+  id: Number, // Custom ID
   name: String,
   cards: [cardSchema],
   userId: { type: String, required: true }

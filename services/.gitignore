@@ -1,0 +1,18 @@
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+.env
+config.env
+*.env.local
+
+firebase-credentials.json
+*-firebase-adminsdk-*.json
+
+.DS_Store
+Thumbs.db
+
+docker-compose.override.yml

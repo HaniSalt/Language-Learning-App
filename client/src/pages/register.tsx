@@ -74,17 +74,6 @@ const Register: FunctionalComponent<RegisterProps> = ({ setPage, setIsLoggedIn, 
             userId: firebaseUser.uid,
             dateOfCreation: new Date().toISOString()
           };
-          try {
-            await axios.post('http://localhost:3001/post', userData);
-            console.log('User data posted to MongoDB, default decks created.');
-            await handleSuccessfulAuth(firebaseUser); // Fetch decks (including default ones)
-          } catch (err) {
-            console.error('Error posting user data or fetching initial decks:', err);
-            setError('Registration complete, but failed to setup account data. Please try logging in.');
-            // Potentially sign out the firebase user if backend setup fails critically
-          }
-        } else {
-            setError('Registration failed: Could not retrieve user details.');
         }
       }
     } catch (err: any) {
