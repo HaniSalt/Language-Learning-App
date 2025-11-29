@@ -1,12 +1,35 @@
-func VerifyIDToken(context, token){
+package handlers
 
+import (
+	"context"
+	"net/http"
+	"strings"
+	"internal/firebase"
+
+	"github.com/gin-gonic/gin"
+)
+type TokenRequest struct {
+	Token string `json:"token" binding:"required"`
 }
-
-Goal: Accept token, return UID or error
-
-Handler ValidateToken:
-    1. Parse JSON body to get token string //which json? fireabase credentials? What to get?
-    2. Get Firebase auth client // how
-    3. Call VerifyIDToken(context, token) //whats context here?
-    4. If error: return 401 Unauthorized
-    5. If success: return 200 with UID
+func ValidateToken(c *gin.Context) {
+	var req TokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "token required"})
+		return
+	}
+	authClient, err := firebase.GetAuthClient()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "firebase error"})
+		return
+	}
+	token, err := authClient.VerifyIDToken(context.Background(), req.Token)
+	
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		return
+	}
+    
+	c.JSON(http.StatusOK, gin.H{
+		"uid": token.UID,
+	})
+}
