@@ -3,16 +3,16 @@ package main
 import (
     "log"
     "os"
-    "internal/firebase"
-    "internal/handlers"
+    "user-service/internal/firebase"
+    "user-service/internal/handlers"
     "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
 )
 
 func main() {
-    err := godotenv.Load()
+    err := godotenv.Load(".config.env")
     if err != nil {
-        log.Println("No .env file found, using system env variables")
+        log.Println("No .env file found")
     }
 
     err = firebase.InitFirebase()

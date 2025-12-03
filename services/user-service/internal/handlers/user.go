@@ -3,20 +3,20 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"internal/firebase"
+	"user-service/internal/firebase"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetUserProfile(c *gin.Context) {
 	uid := c.Param("uid")
-	if uid == "" {
+	if uid == ""{
 		c.JSON(http.StatusBadRequest, gin.H{"error": "uid required"})
 		return
 	}
 
 	authClient, err := firebase.GetAuthClient()
-	if err != nil {
+	if err != nil{
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "firebase error"})
 		return
 	}

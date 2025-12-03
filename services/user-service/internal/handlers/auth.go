@@ -3,14 +3,14 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"strings"
-	"internal/firebase"
+	"user-service/internal/firebase"
 
 	"github.com/gin-gonic/gin"
 )
 type TokenRequest struct {
 	Token string `json:"token" binding:"required"`
 }
+
 func ValidateToken(c *gin.Context) {
 	var req TokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
