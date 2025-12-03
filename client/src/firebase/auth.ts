@@ -21,6 +21,12 @@ export const doPasswordChange = (password) => {
     return updatePassword(auth.currentUser, password)
 }
 
+// debugging code for getting token so I can check userId with postman
+// const user = auth.currentUser;
+// if (user) {
+//   user.getIdToken().then(token => console.log(token));
+// }
+
 
 export { auth };
 // export const doSendEmailVerification = async () => {
