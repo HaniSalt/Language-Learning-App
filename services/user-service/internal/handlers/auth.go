@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"user-service/internal/firebase"
-	"log"
+	// "log"
 	"github.com/gin-gonic/gin"
 )
 type TokenRequest struct {
@@ -17,11 +17,12 @@ func ValidateToken(c *gin.Context) {
 	var req TokenRequest
 	
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Printf("Binding error: %v", err)
+		//log.Printf("Binding error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "token required"})
+		//log.Printf("token: %s", req.Token)
 		return
 	}
-	log.Printf("token: %s", req.Token)
+	//log.Printf("token: %s", req.Token)
 
 	authClient, err := firebase.GetAuthClient()
 	if err != nil {

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/userdb
+      - PORT=8081
+
+  deck-service:
+    build: ./services/deck-service
+    ports:
+      - "8082:8082"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/deckdb
+      - PORT=8082
+
+  card-service:
+    build: ./services/card-service
+    ports:
+      - "8083:8083"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/carddb
+      - PORT=8083
+
+  api-gateway:
+    build: ./services/api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - USER_SERVICE_URL=http://user-service:8081
+      - DECK_SERVICE_URL=http://deck-service:8082
+      - CARD_SERVICE_URL=http://card-service:8083
+      - PORT=8080
+    depends_on:
+      - user-service
+      - deck-service
+      - card-service
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
