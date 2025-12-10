@@ -1,6 +1,7 @@
 import { FunctionalComponent } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { Deck, Card, updateDeckApi } from "../../utils/deckApi";
+import { Deck, Card } from "../../utils/deckApi";
+import { updateCard, deleteCard } from "../../utils/cardApi";
 import './cardViewerStyles.less';
 import { IconButton, Button as MuiButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,7 +11,7 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 export interface CardViewerProps {
   deck: Deck;
   userId: string;
-  onDeckUpdated: (updatedDeck: Deck) => void;
+  onDeckUpdated: () => void;
 }
 
 export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, userId, onDeckUpdated }) => {
@@ -19,6 +20,7 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, userId,
   const [isEditingCard, setIsEditingCard] = useState(false);
   const [editFrontText, setEditFrontText] = useState('');
   const [editBackText, setEditBackText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Effect to reset view when deck or cards change externally
   useEffect(() => {
@@ -26,14 +28,14 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, userId,
       setCurrentIndex(prevIndex => (prevIndex >= deck.cards.length ? 0 : prevIndex));
       setIsFlipped(false);
       setIsEditingCard(false);
-      if (deck.cards[currentIndex]) { // Check if current card exists
+      if (deck.cards[currentIndex]) {
          setEditFrontText(deck.cards[currentIndex].front);
          setEditBackText(deck.cards[currentIndex].back);
       }
     } else {
-        setCurrentIndex(0); // No cards, reset index
+        setCurrentIndex(0);
     }
-  }, [deck, deck.cards, currentIndex]); // Added currentIndex to reset edit texts
+  }, [deck, deck.cards, currentIndex]);
 
   if (!deck.cards || deck.cards.length === 0) {
     return <p>No cards in this deck. Add one via Deck Options!</p>;
@@ -60,49 +62,60 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, userId,
   const handleSaveCard = async () => {
     if (!currentCard) return;
 
-    const updatedCardData: Card = {
-      ...currentCard,
-      front: editFrontText,
-      back: editBackText,
-    };
-
-    const updatedCardsArray = deck.cards.map(card =>
-      card.id === currentCard.id ? updatedCardData : card
-    );
-
+    setIsSubmitting(true);
     try {
-      const updatedDeckFromApi = await updateDeckApi(deck.id, { cards: updatedCardsArray, userId });
-      onDeckUpdated(updatedDeckFromApi);
+      console.log('Updating card:', currentCard.id);
+      
+      // Use the new cardApi to update the card
+      await updateCard(currentCard.id, {
+        front: editFrontText.trim(),
+        back: editBackText.trim(),
+      });
+
+      // Trigger parent to refresh deck data - just call without arguments
+      onDeckUpdated();
       setIsEditingCard(false);
-      setIsFlipped(false); // Show front after saving
+      setIsFlipped(false);
+      
     } catch (error) {
       console.error('Failed to save card:', error);
       alert(`Error saving card: ${error.message || 'Please try again.'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDeleteCard = async () => {
     if (!currentCard) return;
     const confirmDelete = confirm('Are you sure you want to delete this card?');
-    if (confirmDelete) {
-      const updatedCardsArray = deck.cards.filter(card => card.id !== currentCard.id);
-      try {
-        const updatedDeckFromApi = await updateDeckApi(deck.id, { cards: updatedCardsArray, userId });
-        onDeckUpdated(updatedDeckFromApi);
-        if (updatedCardsArray.length === 0) {
-            setCurrentIndex(0); // Reset index if no cards left
-        } else if (currentIndex >= updatedCardsArray.length) {
-            setCurrentIndex(updatedCardsArray.length - 1);
-        }
-        setIsFlipped(false);
-        setIsEditingCard(false);
-      } catch (error) {
-        console.error('Failed to delete card:', error);
-        alert(`Error deleting card: ${error.message || 'Please try again.'}`);
+    if (!confirmDelete) return;
+
+    setIsSubmitting(true);
+    try {
+      console.log('Deleting card:', currentCard.id);
+      
+      // Use the new cardApi to delete the card
+      await deleteCard(currentCard.id);
+
+      // Adjust current index if needed
+      if (deck.cards.length <= 1) {
+        setCurrentIndex(0);
+      } else if (currentIndex >= deck.cards.length - 1) {
+        setCurrentIndex(deck.cards.length - 2);
       }
+
+      // Trigger parent to refresh deck data - just call without arguments
+      onDeckUpdated();
+      setIsFlipped(false);
+      setIsEditingCard(false);
+      
+    } catch (error) {
+      console.error('Failed to delete card:', error);
+      alert(`Error deleting card: ${error.message || 'Please try again.'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
 
   return (
     <div class="card-viewer">
@@ -112,17 +125,36 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, userId,
             label="Front"
             value={editFrontText}
             onChange={(e: any) => setEditFrontText(e.target.value)}
-            variant="outlined" fullWidth margin="normal"
+            variant="outlined" 
+            fullWidth 
+            margin="normal"
+            disabled={isSubmitting}
           />
           <TextField
             label="Back"
             value={editBackText}
             onChange={(e: any) => setEditBackText(e.target.value)}
-            variant="outlined" fullWidth margin="normal"
+            variant="outlined" 
+            fullWidth 
+            margin="normal"
+            disabled={isSubmitting}
           />
           <div class="card-editor-actions">
-            <MuiButton onClick={handleSaveCard} variant="contained" color="primary">Save</MuiButton>
-            <MuiButton onClick={() => setIsEditingCard(false)} variant="outlined">Cancel</MuiButton>
+            <MuiButton 
+              onClick={handleSaveCard} 
+              variant="contained" 
+              color="primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save'}
+            </MuiButton>
+            <MuiButton 
+              onClick={() => setIsEditingCard(false)} 
+              variant="outlined"
+              disabled={isSubmitting}
+            >
+              Cancel
+            </MuiButton>
           </div>
         </div>
       ) : currentCard ? (
@@ -143,15 +175,21 @@ export const CardViewer: FunctionalComponent<CardViewerProps> = ({ deck, userId,
       {!isEditingCard && currentCard && (
         <>
           <div class="card-actions">
-            <MuiButton onClick={handleFlip} variant="contained" fullWidth>
+            <MuiButton onClick={handleFlip} variant="contained" fullWidth disabled={isSubmitting}>
               {isFlipped ? 'Show Question' : 'Show Answer'}
             </MuiButton>
           </div>
           <div class="card-viewer-bottom">
-            <IconButton onClick={handleEditCard} title="Edit Card"><EditIcon /></IconButton>
-            <IconButton onClick={handleDeleteCard} title="Delete Card"><DeleteIcon /></IconButton>
+            <IconButton onClick={handleEditCard} title="Edit Card" disabled={isSubmitting}>
+              <EditIcon />
+            </IconButton>
+            <IconButton onClick={handleDeleteCard} title="Delete Card" disabled={isSubmitting}>
+              <DeleteIcon />
+            </IconButton>
             {deck.cards.length > 1 && (
-                <IconButton onClick={handleNext} title="Next Card"><SkipNextIcon /></IconButton>
+                <IconButton onClick={handleNext} title="Next Card" disabled={isSubmitting}>
+                  <SkipNextIcon />
+                </IconButton>
             )}
           </div>
         </>

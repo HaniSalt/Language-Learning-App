@@ -26,7 +26,9 @@ const App: FunctionalComponent = () => {
   const fetchUserDecks = useCallback(async (user: FirebaseUser | null) => {
     if (user) {
       try {
+        console.log('Fetching decks for user:', user.uid);
         const decks = await getDecksForUser(user.uid);
+        console.log('Fetched decks:', decks);
         setUserDecks(decks);
       } catch (error) {
         console.error("Failed to fetch user decks:", error);
@@ -62,6 +64,12 @@ const App: FunctionalComponent = () => {
     }
     setSelectedDeckId(null);
   };
+
+  // Refresh the selected deck after card operations
+  const handleDeckUpdate = useCallback(async () => {
+    console.log('handleDeckUpdate called');
+    await fetchUserDecks(currentUser);
+  }, [currentUser, fetchUserDecks]);
   
   const renderPage = () => {
     if (isLoadingAuth) return <div>Loading application...</div>;
@@ -85,20 +93,20 @@ const App: FunctionalComponent = () => {
               initialDeck={selectedDeck}
               userId={currentUser?.uid || ''}
               onBack={() => setSelectedDeckId(null)}
-              onDecksChanged={() => fetchUserDecks(currentUser)}
+              onDecksChanged={handleDeckUpdate}
             />
           ) : (
             <DeckList
               decks={userDecks}
               setSelectedDeckId={setSelectedDeckId}
               currentUserId={currentUser?.uid || ''}
-              onDecksChanged={() => fetchUserDecks(currentUser)}
+              onDecksChanged={handleDeckUpdate}
             />
           ), 'decks'
         );
       case 'importexportpage':
         return ensureLoggedIn(
-          <ImportExport onDecksChanged={() => fetchUserDecks(currentUser)} />,
+          <ImportExport onDecksChanged={handleDeckUpdate} />,
           'importexportpage'
         );
       case 'analytics':

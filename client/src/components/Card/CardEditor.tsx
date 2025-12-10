@@ -1,19 +1,20 @@
 import { FunctionalComponent } from 'preact';
 import { useState, useRef } from 'preact/hooks';
 import { TextField, Button } from '@mui/material';
-import { Deck, Card, updateDeckApi } from "../../utils/deckApi";
+import { createCard } from "../../utils/cardApi";
 import './cardEditorStyles.less';
 
 export interface CardEditorProps {
   deckId: number;
   userId: string;
-  onCardAdded: (updatedDeck: Deck) => void;
+  onCardAdded: () => void;
   onCancel: () => void;
 }
 
 export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, userId, onCardAdded, onCancel }) => {
   const [frontText, setFrontText] = useState('');
   const [backText, setBackText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,6 +64,7 @@ export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, userI
       return;
     }
 
+    setIsSubmitting(true);
     let imageUrl = '';
     let audioUrl = '';
 
@@ -72,6 +74,7 @@ export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, userI
         const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
         if (imageFile.size > maxSizeInBytes) {
           alert('Image size exceeds 2MB limit.');
+          setIsSubmitting(false);
           return;
         }
         imageUrl = await resizeImage(imageFile, 800, 600);
@@ -81,29 +84,25 @@ export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, userI
         audioUrl = await readFileAsDataURL(audioInputRef.current.files[0]);
       }
 
-      // Create the new card
-      const newCard: Omit<Card, 'id'> = { // API/backend handles new card ID generation
-        front: frontText,
-        back: backText,
-        imageUrl,
-        audioUrl,
-      };
-      const tempNewCardWithId: Card = {
-        ...newCard,
-        id: Date.now(), // Temporary ID, backend should generate its own persistent ID
-      };
-      const updatedDeck = await updateDeckApi(deckId, { cards: [tempNewCardWithId] as any, userId });
+      console.log('Creating card with deckId:', deckId);
+      
+      // Use the new cardApi to create the card
+      await createCard(deckId, frontText.trim(), backText.trim(), imageUrl, audioUrl);
 
-
-      onCardAdded(updatedDeck);
+      // Clear form
       setFrontText('');
       setBackText('');
       if (imageInputRef.current) imageInputRef.current.value = '';
       if (audioInputRef.current) audioInputRef.current.value = '';
 
+      // Trigger parent to refresh - just call without arguments
+      onCardAdded();
+      
     } catch (error) {
       console.error('Failed to add card:', error);
       alert(`Error adding card: ${error.message || 'Please try again.'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -118,6 +117,7 @@ export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, userI
         fullWidth
         margin="normal"
         required
+        disabled={isSubmitting}
       />
       <TextField
         label="Back"
@@ -127,23 +127,28 @@ export const CardEditor: FunctionalComponent<CardEditorProps> = ({ deckId, userI
         fullWidth
         margin="normal"
         required
+        disabled={isSubmitting}
       />
       <div class="file-inputs">
         <label>
           Image:
-          <input type="file" accept="image/*" ref={imageInputRef} />
+          <input type="file" accept="image/*" ref={imageInputRef} disabled={isSubmitting} />
         </label>
         <label>
           Audio:
-          <input type="file" accept="audio/*" ref={audioInputRef} />
+          <input type="file" accept="audio/*" ref={audioInputRef} disabled={isSubmitting} />
         </label>
       </div>
       <div class="card-editor-actions">
-        <Button type="submit" variant="contained" color="primary">
-          Save Card
+        <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : 'Save Card'}
         </Button>
-        <Button variant="outlined" onClick={() => {
-            setFrontText(''); setBackText('');
+        <Button 
+          variant="outlined" 
+          disabled={isSubmitting}
+          onClick={() => {
+            setFrontText(''); 
+            setBackText('');
             if (imageInputRef.current) imageInputRef.current.value = '';
             if (audioInputRef.current) audioInputRef.current.value = '';
             onCancel();

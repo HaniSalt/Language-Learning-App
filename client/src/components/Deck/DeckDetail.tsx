@@ -8,10 +8,10 @@ import MuiButton from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
 interface DeckDetailProps {
-  initialDeck: Deck; // The specific deck object passed from App.tsx
-  userId: string; // Current user's ID
+  initialDeck: Deck;
+  userId: string;
   onBack: () => void;
-  onDecksChanged: () => void; // Callback to App.tsx to refresh all decks
+  onDecksChanged: () => void;
 }
 
 export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
@@ -27,7 +27,9 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
   const [newDeckName, setNewDeckName] = useState('');
 
   useEffect(() => {
-    setDeck(initialDeck); // Update local deck state if initialDeck prop changes
+    console.log('DeckDetail received deck:', initialDeck);
+    console.log('Deck ID:', initialDeck.id);
+    setDeck(initialDeck);
     setNewDeckName(initialDeck.name);
   }, [initialDeck]);
 
@@ -52,10 +54,10 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
     setShowOptions(false);
   };
 
-  const handleCardAddedOrUpdated = (updatedDeckFromChild: Deck) => {
-    setDeck(updatedDeckFromChild);
+  // Changed: no longer receives deck parameter
+  const handleCardAddedOrUpdated = () => {
     setIsAddingCard(false);
-    onDecksChanged();
+    onDecksChanged(); // This will refresh all decks in App.tsx
   };
 
   const handleEditDeckName = () => {
@@ -70,8 +72,8 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
       try {
         const updatedDeckPayload: Partial<Deck> = { name: newDeckName.trim() };
         const updatedDeckFromApi = await updateDeckApi(deck.id, updatedDeckPayload);
-        setDeck(updatedDeckFromApi); // Update local state with API response
-        onDecksChanged(); // Notify App.tsx
+        setDeck(updatedDeckFromApi);
+        onDecksChanged();
         setIsEditingDeckName(false);
       } catch (error) {
         console.error('Failed to update deck name:', error);
@@ -82,10 +84,11 @@ export const DeckDetail: FunctionalComponent<DeckDetailProps> = ({
     }
   };
 
-  const handleDeckUpdatedByCardViewer = (updatedDeckFromChild: Deck) => {
-    setDeck(updatedDeckFromChild);
-    onDecksChanged(); // Notify App.tsx
+  // Changed: no longer receives deck parameter
+  const handleDeckUpdatedByCardViewer = () => {
+    onDecksChanged(); // This will refresh all decks in App.tsx
   };
+
   return (
     <div class="deck-detail">
       <div class="deck-top-bar">

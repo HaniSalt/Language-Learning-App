@@ -21,11 +21,13 @@ export const doPasswordChange = (password) => {
     return updatePassword(auth.currentUser, password)
 }
 
-// debugging code for getting token so I can check userId with postman
+//debugging code for getting token so I can check userId with postman
 // const user = auth.currentUser;
 // if (user) {
 //   user.getIdToken().then(token => console.log(token));
 // }
+
+// (window as any).auth = auth;
 
 
 export { auth };

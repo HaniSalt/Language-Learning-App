@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
@@ -12,11 +12,13 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o user-service ./cmd/main.go
 FROM alpine:latest
 
 WORKDIR /app
-COPY firebase-credentials.json ./
+
+RUN apk --no-cache add ca-certificates
 
 COPY --from=builder /app/user-service .
 
-COPY --from=builder /app/.config.env* ./
+COPY firebase-credentials.json ./
+COPY .config.env* ./
 
 EXPOSE 8081
 

@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   user-service:
@@ -6,15 +6,15 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/userdb
       - PORT=8081
+      - FIREBASE_CREDENTIALS_PATH=/app/firebase-credentials.json
 
   deck-service:
     build: ./services/deck-service
     ports:
       - "8082:8082"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/deckdb
+      - ATLAS_URI=mongodb+srv://hanisalti23:Frozenboy123@cluster0.twthccf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       - PORT=8082
 
   card-service:
@@ -22,7 +22,7 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/carddb
+      - ATLAS_URI=mongodb+srv://hanisalti23:Frozenboy123@cluster0.twthccf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       - PORT=8083
 
   api-gateway:
@@ -38,13 +38,3 @@ services:
       - user-service
       - deck-service
       - card-service
-
-  mongo:
-    image: mongo:7
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-volumes:
-  mongo-data:
